@@ -127,7 +127,7 @@
                     </div>
                     <div>
                         <label for="stake" class="block text-sm font-medium text-neutral-300">Valor Apostado (R$)</label>
-                        <input type="number" step="0.001" id="stake" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                        <input type="number" step="0.001" id="stake" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity50" required>
                     </div>
                     <div>
                         <label for="odds" class="block text-sm font-medium text-neutral-300">Odds</label>
@@ -303,6 +303,21 @@
                             </tr>
                         </thead>
                         <tbody id="people-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                            <tr class="hover:bg-zinc-800 transition-colors duration-200">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-neutral-200">Exemplo</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-400">R$ 0,00</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="managePlatforms('exemplo')" class="px-3 py-1 bg-neutral-700 text-white rounded hover:bg-neutral-600 transition-colors duration-200" title="Gerenciar Plataformas">Gerenciar</button>
+                                        <button onclick="adjustBalance('exemplo')" class="px-3 py-1 bg-neutral-700 text-white rounded hover:bg-neutral-600 transition-colors duration-200" title="Ajustar Saldo">Ajustar Saldo</button>
+                                        <button onclick="deletePerson('exemplo')" class="p-1 bg-red-700 text-white rounded-full hover:bg-red-600 transition-colors duration-200" title="Deletar Pessoa">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                             </tbody>
                     </table>
                 </div>
@@ -586,6 +601,7 @@
                 renderProfitAnalysis();
             }
         };
+
         btnTabGerenciador.addEventListener('click', () => switchTab('tab-gerenciador'));
         btnTabHistorico.addEventListener('click', () => switchTab('tab-historico'));
         btnTabFreebets.addEventListener('click', () => switchTab('tab-freebets'));
@@ -596,12 +612,14 @@
         const saveBets = () => {
             localStorage.setItem(LOCAL_STORAGE_BETS_KEY, JSON.stringify(bets));
         };
+
         const loadBets = () => {
             const savedBets = localStorage.getItem(LOCAL_STORAGE_BETS_KEY);
             if (savedBets) {
                 bets = JSON.parse(savedBets);
             }
         };
+
         const calculateReturn = (stake, odds, result) => {
             if (result === 'Green') return stake * odds;
             if (result === 'Half Green') return (stake * (odds - 1) / 2) + stake;
@@ -610,11 +628,13 @@
             if (result === 'Aberta' || result === 'Aberta FB' || result === 'Red FB') return 0;
             return 0; // Red
         };
+
         const calculateProfit = (retorno, stake, tipo, result) => {
             if (result === 'Aberta' || result === 'Aberta FB' || result === 'Red FB') return 0;
             if (tipo === 'Freebet') return retorno - stake;
             return retorno - stake;
         };
+
         const renderSummary = () => {
             let totalProfit = 0;
             let totalStaked = 0;
@@ -637,576 +657,780 @@
                     totalBankroll += getPlatformBalance(platform);
                 });
             });
+
             const finalBankroll = totalBankroll;
             currentBankrollDisplay.textContent = formatCurrency(finalBankroll);
             currentBankrollDisplay.style.color = finalBankroll >= 0 ? '#E5E5E5' : '#A3A3A3';
+
             profitLossDisplay.textContent = formatCurrency(totalProfit);
             profitLossDisplay.style.color = totalProfit >= 0 ? '#E5E5E5' : '#A3A3A3';
+
             totalBetsDisplay.textContent = bets.length;
+
             const roi = totalStaked > 0 ? (totalProfit / totalStaked) * 100 : 0;
             roiDisplay.textContent = `${roi.toFixed(2)}%`;
             roiDisplay.style.color = roi >= 0 ? '#E5E5E5' : '#A3A3A3';
         };
+
         const createBetRow = (bet, index, tableBody) => {
             const row = document.createElement('tr');
             row.classList.add('hover:bg-zinc-800', 'transition-colors', 'duration-200');
+
             const retorno = calculateReturn(bet.stake, bet.odds, bet.result);
             const lucro = calculateProfit(retorno, bet.stake, bet.type, bet.result);
+
             const actionsHtml = `
                 <button onclick="editBet(${index})" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Editar">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-6.5l-3.5 3.5m-2.5-2.5l-3.5 3.5m-2.5-2.5l-3.5 3.5m-2.5-2.5l-3.5 3.5M19 8.5V11m0 0l-4 4m4-4l-4 4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </button>
+                <button onclick="deleteBet(${index})" class="text-red-400 hover:text-red-300 transition-colors duration-200" title="Deletar">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                 </button>
                 <button onclick="duplicateBet(${index})" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Duplicar">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                </button>
-                <button onclick="deleteBet(${index})" class="text-red-400 hover:text-red-600 transition-colors duration-200" title="Deletar">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v-3m8 4v-3m-9 8h-3m-4 16v-3m-4 16v-3m15-4v-3m8 4v-3M3 12h-3m16 4h-3M3 8h-3m16 4h-3M19 12h-3M3 16h-3m16 4h-3M8 12h3M12 12v3M12 12h-3" />
                     </svg>
                 </button>
             `;
-            const profitClass = lucro >= 0 ? 'text-green-400' : 'text-red-400';
-            const resultClass = (result) => {
-                if (result === 'Green' || result === 'Half Green') return 'text-green-400 font-bold';
-                if (result === 'Red' || result === 'Half Red' || result === 'Red FB') return 'text-red-400 font-bold';
-                return 'text-white font-bold';
-            };
+            
             row.innerHTML = `
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${bet.date}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${bet.description}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${bet.personName}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${bet.platformName}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${bet.type}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${formatCurrency(bet.stake)}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${bet.odds.toFixed(2)}</td>
-                <td class="px-4 py-2 text-xs whitespace-nowrap ${resultClass(bet.result)}">${bet.result}</td>
-                <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${formatCurrency(retorno)}</td>
-                <td class="px-4 py-2 text-xs whitespace-nowrap ${profitClass}">${formatCurrency(lucro)}</td>
-                <td class="px-4 py-2 text-right text-xs font-medium space-x-2">${actionsHtml}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${bet.date}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${bet.description}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${bet.personName}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${bet.platformName}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${bet.type}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${formatCurrency(bet.stake)}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${bet.odds}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-semibold ${bet.result === 'Green' ? 'text-green-500' : bet.result.includes('Half') ? 'text-yellow-500' : bet.result.includes('Red') ? 'text-red-500' : 'text-neutral-400'}">${bet.result}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${formatCurrency(retorno)}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-bold ${lucro >= 0 ? 'text-green-500' : 'text-red-500'}">${formatCurrency(lucro)}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editBet(${index})" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Editar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button onclick="deleteBet(${index})" class="text-red-400 hover:text-red-300 transition-colors duration-200" title="Deletar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                        <button onclick="duplicateBet(${index})" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Duplicar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v-3m8 4v-3m-9 8h-3m-4 16v-3m-4 16v-3m15-4v-3m8 4v-3M3 12h-3m16 4h-3M3 8h-3m16 4h-3M19 12h-3M3 16h-3m16 4h-3M8 12h3M12 12v3M12 12h-3" />
+                            </svg>
+                        </button>
+                    </div>
+                </td>
             `;
+
             tableBody.appendChild(row);
         };
+
         const renderOpenBets = () => {
             betsTableBody.innerHTML = '';
-            const openBets = bets.filter(bet => bet.result === 'Aberta' || bet.result === 'Aberta FB' || bet.result === 'Red FB');
-            openBets.forEach((bet, index) => createBetRow(bet, index, betsTableBody));
+            bets.forEach((bet, index) => {
+                if (bet.result === 'Aberta' || bet.result === 'Aberta FB' || bet.result === 'Red FB') {
+                    createBetRow(bet, index, betsTableBody);
+                }
+            });
         };
+
         const renderHistoryBets = () => {
             historyTableBody.innerHTML = '';
-            const historyBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB' && bet.result !== 'Red FB');
-            historyBets.forEach((bet, index) => createBetRow(bet, index, historyTableBody));
-        };
-        const addOrUpdateBet = () => {
-            const date = dateInput.value;
-            const description = descriptionInput.value;
-            const personId = personSelect.value;
-            const platformId = platformSelect.value;
-            const type = typeSelect.value;
-            const stake = parseFloat(stakeInput.value);
-            const odds = parseFloat(oddsInput.value);
-            const result = resultSelect.value;
-
-            if (!date || !description || !personId || !platformId || isNaN(stake) || isNaN(odds) || !result) {
-                showMessage('Por favor, preencha todos os campos.', 'red');
-                return;
-            }
-
-            const person = people.find(p => p.id === personId);
-            const platform = person.platforms.find(p => p.id === platformId);
-
-            if (isEditingBetIndex === -1) {
-                const newBet = {
-                    id: Date.now().toString(),
-                    date, description, type,
-                    personId, personName: person.name,
-                    platformId, platformName: platform.name,
-                    stake, odds, result
-                };
-
-                bets.push(newBet);
-                showMessage('Aposta adicionada com sucesso!', 'green');
-            } else {
-                const betToUpdate = bets[isEditingBetIndex];
-                const oldStake = betToUpdate.stake;
-                const oldResult = betToUpdate.result;
-
-                betToUpdate.date = date;
-                betToUpdate.description = description;
-                betToUpdate.personId = personId;
-                betToUpdate.personName = person.name;
-                betToUpdate.platformId = platformId;
-                betToUpdate.platformName = platform.name;
-                betToUpdate.type = type;
-                betToUpdate.stake = stake;
-                betToUpdate.odds = odds;
-                betToUpdate.result = result;
-
-                // Ajuste de saldo se a aposta foi finalizada
-                if (oldResult === 'Aberta' || oldResult === 'Aberta FB' || oldResult === 'Red FB') {
-                    const retorno = calculateReturn(stake, odds, result);
-                    const lucro = calculateProfit(retorno, stake, type, result);
-                    const diffLucro = lucro; // Quando aposta é finalizada, o lucro é o valor total
-                    adjustPlatformBalance(personId, platformId, diffLucro);
+            bets.forEach((bet, index) => {
+                if (bet.result !== 'Aberta' && bet.result !== 'Aberta FB' && bet.result !== 'Red FB') {
+                    createBetRow(bet, index, historyTableBody);
                 }
-                
-                showMessage('Aposta atualizada com sucesso!', 'green');
-            }
-
-            saveBets();
-            updateAll();
-            resetForm();
+            });
         };
 
-        const editBet = (index) => {
-            isEditingBetIndex = index;
-            const betToEdit = bets[index];
-            formTitle.textContent = 'Editar Aposta';
-            formButton.textContent = 'Salvar Edição';
+        const addBet = async (betData) => {
+            try {
+                // Adiciona a aposta ao Firebase
+                const docRef = await addDoc(collection(db, "bets"), { ...betData, userId: auth.currentUser.uid });
+                betData.id = docRef.id;
+
+                // Encontra a pessoa e a plataforma para atualizar o saldo
+                const person = people.find(p => p.id === betData.personId);
+                const platform = person.platforms.find(p => p.id === betData.platformId);
+
+                // Deduz o valor da aposta do saldo da plataforma, exceto para Freebet
+                if (betData.type !== 'Freebet') {
+                    platform.balance -= betData.stake;
+                }
+
+                // Salva a aposta e atualiza os saldos no localStorage
+                bets.unshift(betData);
+                saveBets();
+                savePeople();
+                renderSummary();
+                renderOpenBets();
+
+                // Atualiza o documento no Firestore com o novo saldo
+                await updateDoc(doc(db, "people", person.id), {
+                    platforms: person.platforms
+                });
+                showMessage('Aposta adicionada com sucesso!', 'green');
+
+            } catch (error) {
+                console.error("Erro ao adicionar aposta: ", error);
+                showMessage('Erro ao adicionar aposta. Tente novamente.', 'red');
+            }
+        };
+
+        const updateBet = async (index, betData) => {
+            const oldBet = bets[index];
+            const oldPerson = people.find(p => p.id === oldBet.personId);
+            const oldPlatform = oldPerson.platforms.find(p => p.id === oldBet.platformId);
+
+            // Reverte a alteração do saldo da aposta antiga
+            if (oldBet.type !== 'Freebet' && oldBet.result !== 'Aberta' && oldBet.result !== 'Aberta FB' && oldBet.result !== 'Red FB') {
+                const oldProfit = calculateProfit(calculateReturn(oldBet.stake, oldBet.odds, oldBet.result), oldBet.stake, oldBet.type, oldBet.result);
+                oldPlatform.balance -= oldProfit;
+            } else if (oldBet.result === 'Red FB') {
+                oldPlatform.balance -= calculateProfit(0, oldBet.stake, oldBet.type, oldBet.result);
+            }
+            if (oldBet.type !== 'Freebet' && (oldBet.result === 'Aberta' || oldBet.result === 'Aberta FB' || oldBet.result === 'Red FB')) {
+                oldPlatform.balance += oldBet.stake;
+            }
+
+
+            // Aplica a nova alteração no saldo
+            const newPerson = people.find(p => p.id === betData.personId);
+            const newPlatform = newPerson.platforms.find(p => p.id === betData.platformId);
             
+            if (betData.result !== 'Aberta' && betData.result !== 'Aberta FB' && betData.result !== 'Red FB') {
+                const newProfit = calculateProfit(calculateReturn(betData.stake, betData.odds, betData.result), betData.stake, betData.type, betData.result);
+                newPlatform.balance += newProfit;
+            } else if (betData.result === 'Red FB') {
+                newPlatform.balance += calculateProfit(0, betData.stake, betData.type, betData.result);
+            }
+            if (betData.type !== 'Freebet' && (betData.result === 'Aberta' || betData.result === 'Aberta FB' || betData.result === 'Red FB')) {
+                newPlatform.balance -= betData.stake;
+            }
+
+            // Atualiza a aposta na lista e no Firebase
+            bets[index] = betData;
+            saveBets();
+            savePeople();
+            renderSummary();
+            switchTab('tab-historico');
+            
+            try {
+                // Atualiza o documento no Firestore
+                await updateDoc(doc(db, "bets", betData.id), betData);
+                await updateDoc(doc(db, "people", oldPerson.id), {
+                    platforms: oldPerson.platforms
+                });
+                if (oldPerson.id !== newPerson.id) {
+                    await updateDoc(doc(db, "people", newPerson.id), {
+                        platforms: newPerson.platforms
+                    });
+                }
+                showMessage('Aposta atualizada com sucesso!', 'green');
+            } catch (error) {
+                console.error("Erro ao atualizar aposta: ", error);
+                showMessage('Erro ao atualizar aposta. Tente novamente.', 'red');
+            }
+        };
+
+        window.editBet = (index) => {
+            const betToEdit = bets[index];
             dateInput.value = betToEdit.date;
             descriptionInput.value = betToEdit.description;
-            populatePersonSelect();
             personSelect.value = betToEdit.personId;
             populatePlatformSelect(betToEdit.personId, platformSelect, betToEdit.platformName);
             typeSelect.value = betToEdit.type;
             stakeInput.value = betToEdit.stake;
             oddsInput.value = betToEdit.odds;
             resultSelect.value = betToEdit.result;
+            formTitle.textContent = 'Editar Aposta';
+            formButton.textContent = 'Atualizar Aposta';
+            isEditingBetIndex = index;
+            // Volta para a aba de apostas
             switchTab('tab-gerenciador');
         };
 
-        const duplicateBet = (index) => {
-            const betToDuplicate = bets[index];
-            const newBet = { ...betToDuplicate, id: Date.now().toString() };
-            bets.push(newBet);
-            saveBets();
-            updateAll();
-            showMessage('Aposta duplicada com sucesso!', 'green');
-        };
-
-        const deleteBet = (index) => {
-            if (confirm('Tem certeza que deseja deletar esta aposta?')) {
-                const betToDelete = bets[index];
-                const personId = betToDelete.personId;
-                const platformId = betToDelete.platformId;
-                
-                // Retira o lucro/prejuízo do saldo da plataforma ao deletar aposta finalizada
-                if (betToDelete.result !== 'Aberta' && betToDelete.result !== 'Aberta FB' && betToDelete.result !== 'Red FB') {
-                    const retorno = calculateReturn(betToDelete.stake, betToDelete.odds, betToDelete.result);
-                    const lucro = calculateProfit(retorno, betToDelete.stake, betToDelete.type, betToDelete.result);
-                    adjustPlatformBalance(personId, platformId, -lucro);
-                }
-                
-                bets.splice(index, 1);
-                saveBets();
-                updateAll();
-                showMessage('Aposta deletada.', 'green');
-            }
-        };
-
-        const clearAllBets = () => {
-            if (confirm('ATENÇÃO: Isso irá apagar todas as apostas (Histórico e Abertas)! Tem certeza?')) {
-                bets = [];
-                saveBets();
-                updateAll();
-                showMessage('Todos os dados de apostas foram apagados.', 'green');
-            }
-        };
-        clearBetDataBtn.addEventListener('click', clearAllBets);
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            addOrUpdateBet();
-        });
-
-        // --- Lógica da Aba Freebets ---
-        const saveFreebets = () => {
-            localStorage.setItem(LOCAL_STORAGE_FREEBETS_KEY, JSON.stringify(unusedFreebets));
-        };
-        const loadFreebets = () => {
-            const savedFreebets = localStorage.getItem(LOCAL_STORAGE_FREEBETS_KEY);
-            if (savedFreebets) {
-                unusedFreebets = JSON.parse(savedFreebets);
-            }
-        };
-        const renderUnusedFreebets = () => {
-            freebetsTableBody.innerHTML = '';
-            unusedFreebets.forEach((freebet, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${freebet.personName}</td>
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${freebet.platformName}</td>
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${formatCurrency(freebet.stake)} (${freebet.quantity})</td>
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${freebet.received}</td>
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${freebet.expiration || 'N/A'}</td>
-                    <td class="px-4 py-2 text-right text-xs font-medium space-x-2">
-                        <button onclick="useFreebet(${index})" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Usar">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4-4m-12 5l6 6l12-12"></path>
-                            </svg>
-                        </button>
-                        <button onclick="deleteFreebet(${index})" class="text-red-400 hover:text-red-600 transition-colors duration-200" title="Deletar">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </td>
-                `;
-                freebetsTableBody.appendChild(row);
-            });
-        };
-        const useFreebet = (index) => {
-            const freebetToUse = unusedFreebets[index];
-            const remainingQuantity = freebetToUse.quantity - 1;
-
-            if (remainingQuantity > 0) {
-                freebetToUse.quantity = remainingQuantity;
-            } else {
-                unusedFreebets.splice(index, 1);
-            }
-            saveFreebets();
-            renderUnusedFreebets();
-            showMessage('Freebet usada e removida.', 'green');
-        };
-        const deleteFreebet = (index) => {
-            if (confirm('Tem certeza que deseja apagar esta freebet?')) {
-                unusedFreebets.splice(index, 1);
-                saveFreebets();
-                renderUnusedFreebets();
-                showMessage('Freebet apagada.', 'green');
-            }
-        };
-        freebetForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const personId = freebetPersonSelect.value;
-            const platformId = freebetPlatformSelect.value;
-            const stake = parseFloat(freebetStakeInput.value);
-            const quantity = parseInt(freebetQuantityInput.value);
-            const received = freebetReceivedSelect.value;
-            const expiration = freebetExpirationInput.value;
-            
-            if (!personId || !platformId || isNaN(stake) || isNaN(quantity)) {
-                showMessage('Por favor, preencha todos os campos obrigatórios.', 'red');
+        window.deleteBet = async (index) => {
+            if (!confirm('Tem certeza que deseja deletar esta aposta?')) {
                 return;
             }
-            
-            const person = people.find(p => p.id === personId);
-            const platform = person.platforms.find(p => p.id === platformId);
+            const betToDelete = bets[index];
+            const person = people.find(p => p.id === betToDelete.personId);
+            const platform = person.platforms.find(p => p.id === betToDelete.platformId);
 
-            const newFreebet = {
-                id: Date.now().toString(),
-                personId, personName: person.name,
-                platformId, platformName: platform.name,
-                stake, quantity, received, expiration
+            if (betToDelete.result !== 'Aberta' && betToDelete.result !== 'Aberta FB' && betToDelete.result !== 'Red FB') {
+                const profit = calculateProfit(calculateReturn(betToDelete.stake, betToDelete.odds, betToDelete.result), betToDelete.stake, betToDelete.type, betToDelete.result);
+                platform.balance -= profit;
+            } else if (betToDelete.result === 'Red FB') {
+                platform.balance -= calculateProfit(0, betToDelete.stake, betToDelete.type, betToDelete.result);
+            }
+            if (betToDelete.type !== 'Freebet' && (betToDelete.result === 'Aberta' || betToDelete.result === 'Aberta FB' || betToDelete.result === 'Red FB')) {
+                platform.balance += betToDelete.stake;
+            }
+
+            bets.splice(index, 1);
+            saveBets();
+            savePeople();
+            renderSummary();
+            renderOpenBets();
+            renderHistoryBets();
+            
+            try {
+                await deleteDoc(doc(db, "bets", betToDelete.id));
+                await updateDoc(doc(db, "people", person.id), { platforms: person.platforms });
+                showMessage('Aposta deletada com sucesso!', 'green');
+            } catch (error) {
+                console.error("Erro ao deletar aposta: ", error);
+                showMessage('Erro ao deletar aposta. Tente novamente.', 'red');
+            }
+        };
+
+        window.duplicateBet = (index) => {
+            const betToDuplicate = bets[index];
+            dateInput.value = betToDuplicate.date;
+            descriptionInput.value = betToDuplicate.description;
+            personSelect.value = betToDuplicate.personId;
+            populatePlatformSelect(betToDuplicate.personId, platformSelect, betToDuplicate.platformName);
+            typeSelect.value = betToDuplicate.type;
+            stakeInput.value = betToDuplicate.stake;
+            oddsInput.value = betToDuplicate.odds;
+            resultSelect.value = betToDuplicate.result;
+            formTitle.textContent = 'Adicionar Nova Aposta';
+            formButton.textContent = 'Adicionar Aposta';
+            isEditingBetIndex = -1;
+            switchTab('tab-gerenciador');
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const betData = {
+                date: dateInput.value,
+                description: descriptionInput.value,
+                personId: personSelect.value,
+                personName: personSelect.options[personSelect.selectedIndex].textContent,
+                platformId: platformSelect.value,
+                platformName: platformSelect.options[platformSelect.selectedIndex].textContent,
+                type: typeSelect.value,
+                stake: parseFloat(stakeInput.value),
+                odds: parseFloat(oddsInput.value),
+                result: resultSelect.value,
+                timestamp: Date.now()
             };
-            unusedFreebets.push(newFreebet);
-            saveFreebets();
-            renderUnusedFreebets();
-            freebetForm.reset();
-            populatePersonSelect();
-            showMessage('Freebet adicionada com sucesso!', 'green');
+
+            if (isEditingBetIndex !== -1) {
+                betData.id = bets[isEditingBetIndex].id;
+                await updateBet(isEditingBetIndex, betData);
+            } else {
+                await addBet(betData);
+            }
+            resetForm();
         });
 
         // --- Lógica da Aba Pessoas ---
         const savePeople = () => {
             localStorage.setItem(LOCAL_STORAGE_PEOPLE_KEY, JSON.stringify(people));
         };
+
         const loadPeople = () => {
             const savedPeople = localStorage.getItem(LOCAL_STORAGE_PEOPLE_KEY);
             if (savedPeople) {
                 people = JSON.parse(savedPeople);
             }
         };
-        const getPlatformBalance = (platform) => {
-            let balance = platform.balance || 0;
-            const personBets = bets.filter(bet => bet.personId === platform.personId && bet.platformId === platform.id);
-            personBets.forEach(bet => {
-                if (bet.result !== 'Aberta' && bet.result !== 'Aberta FB' && bet.result !== 'Red FB') {
-                    const retorno = calculateReturn(bet.stake, bet.odds, bet.result);
-                    const lucro = calculateProfit(retorno, bet.stake, bet.type, bet.result);
-                    balance += lucro;
-                }
-            });
-            return balance;
-        };
 
         const renderPeople = () => {
             peopleTableBody.innerHTML = '';
-            people.forEach(person => {
+            people.forEach((person, index) => {
+                const totalBalance = person.platforms.reduce((sum, plat) => sum + getPlatformBalance(plat), 0);
+                const actionsHtml = `
+                    <div class="flex items-center gap-2">
+                        <button onclick="managePlatforms('${person.id}')" class="px-3 py-1 bg-neutral-700 text-white rounded hover:bg-neutral-600 transition-colors duration-200" title="Gerenciar Plataformas">Gerenciar</button>
+                        <button onclick="deletePerson('${person.id}')" class="p-1 bg-red-700 text-white rounded-full hover:bg-red-600 transition-colors duration-200" title="Deletar Pessoa">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
                 const row = document.createElement('tr');
-                let totalPersonBalance = 0;
-                person.platforms.forEach(platform => {
-                    totalPersonBalance += getPlatformBalance(platform);
-                });
-                const balanceClass = totalPersonBalance >= 0 ? 'text-green-400' : 'text-red-400';
+                row.classList.add('hover:bg-zinc-800', 'transition-colors', 'duration-200');
                 row.innerHTML = `
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${person.name}</td>
-                    <td class="px-4 py-2 text-xs whitespace-nowrap ${balanceClass}">${formatCurrency(totalPersonBalance)}</td>
-                    <td class="px-4 py-2 text-right text-xs font-medium space-x-2">
-                        <button onclick="managePlatforms('${person.id}')" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Gerenciar Plataformas">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                            </svg>
-                        </button>
-                        <button onclick="deletePerson('${person.id}')" class="text-red-400 hover:text-red-600 transition-colors duration-200" title="Deletar Pessoa">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-neutral-200">${person.name}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-400">${formatCurrency(totalBalance)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">${actionsHtml}</td>
                 `;
                 peopleTableBody.appendChild(row);
             });
         };
-        const addPerson = (name) => {
+
+        const addPerson = async (personName) => {
             const newPerson = {
                 id: Date.now().toString(),
-                name,
+                name: personName,
                 platforms: []
             };
             people.push(newPerson);
             savePeople();
-            renderPeople();
             populatePersonSelect();
-            showMessage('Pessoa adicionada com sucesso!', 'green');
-        };
-        const deletePerson = (id) => {
-            if (confirm('Tem certeza que deseja apagar esta pessoa e todas as suas plataformas e apostas?')) {
-                const personIndex = people.findIndex(p => p.id === id);
-                if (personIndex !== -1) {
-                    people.splice(personIndex, 1);
-                    bets = bets.filter(bet => bet.personId !== id);
-                    unusedFreebets = unusedFreebets.filter(fb => fb.personId !== id);
-                    savePeople();
-                    saveBets();
-                    saveFreebets();
-                    renderPeople();
-                    populatePersonSelect();
-                    showMessage('Pessoa e todos os dados relacionados foram apagados.', 'green');
-                }
+            renderPeople();
+            try {
+                await addDoc(collection(db, "people"), { ...newPerson, userId: auth.currentUser.uid });
+                showMessage('Pessoa adicionada com sucesso!', 'green');
+            } catch (error) {
+                console.error("Erro ao adicionar pessoa: ", error);
+                showMessage('Erro ao adicionar pessoa. Tente novamente.', 'red');
             }
         };
-        const clearAllPeople = () => {
-            if (confirm('ATENÇÃO: Isso irá apagar todas as pessoas, plataformas, apostas e freebets! Tem certeza?')) {
+
+        window.deletePerson = async (personId) => {
+            if (!confirm('Deletar esta pessoa irá remover todas as plataformas e apostas associadas. Tem certeza?')) {
+                return;
+            }
+            people = people.filter(p => p.id !== personId);
+            bets = bets.filter(b => b.personId !== personId);
+            unusedFreebets = unusedFreebets.filter(fb => fb.personId !== personId);
+
+            savePeople();
+            saveBets();
+            saveFreebets();
+            
+            populatePersonSelect();
+            renderPeople();
+            renderSummary();
+            switchTab('tab-gerenciador');
+            
+            try {
+                await deleteDoc(doc(db, "people", personId));
+                // Nota: As apostas e freebets associadas devem ser deletadas com uma função de nuvem.
+                showMessage('Pessoa e dados associados deletados com sucesso!', 'green');
+            } catch (error) {
+                console.error("Erro ao deletar pessoa: ", error);
+                showMessage('Erro ao deletar pessoa. Tente novamente.', 'red');
+            }
+        };
+        
+        personForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const personName = document.getElementById('person-name').value;
+            if (personName) {
+                addPerson(personName);
+                document.getElementById('person-name').value = '';
+            }
+        });
+
+        clearPeopleBtn.addEventListener('click', async () => {
+            if (confirm('Tem certeza que deseja limpar todos os dados de Pessoas e Plataformas? Isso irá remover todos os saldos e plataformas!')) {
                 people = [];
                 bets = [];
                 unusedFreebets = [];
                 savePeople();
                 saveBets();
                 saveFreebets();
-                renderPeople();
                 populatePersonSelect();
-                updateAll();
-                showMessage('Todos os dados foram apagados.', 'green');
+                renderPeople();
+                renderSummary();
+                switchTab('tab-gerenciador');
+                
+                try {
+                    const querySnapshot = await getDocs(collection(db, "people"));
+                    querySnapshot.forEach(async (d) => {
+                        await deleteDoc(doc(db, "people", d.id));
+                    });
+                    const betsSnapshot = await getDocs(collection(db, "bets"));
+                    betsSnapshot.forEach(async (d) => {
+                        await deleteDoc(doc(db, "bets", d.id));
+                    });
+                    const freebetsSnapshot = await getDocs(collection(db, "freebets"));
+                    freebetsSnapshot.forEach(async (d) => {
+                        await deleteDoc(doc(db, "freebets", d.id));
+                    });
+                    showMessage('Todos os dados de pessoas e plataformas foram limpos.', 'green');
+                } catch (error) {
+                console.error("Erro ao limpar dados: ", error);
+                showMessage('Erro ao limpar dados. Tente novamente.', 'red');
             }
-        };
-        clearPeopleBtn.addEventListener('click', clearAllPeople);
-        personForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const personName = document.getElementById('person-name').value;
-            if (personName) {
-                addPerson(personName);
-                personForm.reset();
             }
         });
-        const managePlatforms = (personId) => {
-            peopleListView.classList.add('hidden');
-            platformsManagementView.classList.remove('hidden');
+        
+        window.managePlatforms = (personId) => {
             currentPersonId = personId;
             const person = people.find(p => p.id === personId);
-            currentPersonName.textContent = `Gerenciar Plataformas de ${person.name}`;
-            renderPlatforms();
+            if (person) {
+                currentPersonName.textContent = person.name;
+                peopleListView.classList.add('hidden');
+                platformsManagementView.classList.remove('hidden');
+                renderPlatforms();
+            }
         };
+
         backToPeopleBtn.addEventListener('click', () => {
             peopleListView.classList.remove('hidden');
             platformsManagementView.classList.add('hidden');
             currentPersonId = null;
+            transactionFormContainer.classList.add('hidden');
         });
+
+        // --- Lógica da Aba Plataformas ---
+        const getPlatformBalance = (platform) => {
+            return platform.balance || 0;
+        };
+
         const renderPlatforms = () => {
-            if (!currentPersonId) return;
-            platformsTableBody.innerHTML = '';
             const person = people.find(p => p.id === currentPersonId);
-            person.platforms.forEach(platform => {
+            if (!person) return;
+            platformsTableBody.innerHTML = '';
+            person.platforms.forEach((platform, index) => {
+                const actionsHtml = `
+                    <div class="flex items-center gap-2">
+                        <button onclick="editPlatform('${platform.id}')" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Editar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button onclick="deletePlatform('${platform.id}')" class="text-red-400 hover:text-red-300 transition-colors duration-200" title="Deletar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                        <button onclick="adjustPlatformBalance('${platform.id}')" class="px-3 py-1 bg-neutral-700 text-white rounded hover:bg-neutral-600 transition-colors duration-200" title="Ajustar Saldo">
+                            Ajustar Saldo
+                        </button>
+                    </div>
+                `;
                 const row = document.createElement('tr');
-                const balance = getPlatformBalance(platform);
-                const balanceClass = balance >= 0 ? 'text-green-400' : 'text-red-400';
+                row.classList.add('hover:bg-zinc-800', 'transition-colors', 'duration-200');
                 row.innerHTML = `
-                    <td class="px-4 py-2 text-xs text-neutral-300 whitespace-nowrap">${platform.name}</td>
-                    <td class="px-4 py-2 text-xs whitespace-nowrap ${balanceClass}">${formatCurrency(balance)}</td>
-                    <td class="px-4 py-2 text-right text-xs font-medium space-x-2">
-                        <button onclick="toggleTransactionForm('${platform.id}')" class="text-neutral-400 hover:text-white transition-colors duration-200" title="Ajustar Saldo">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </button>
-                        <button onclick="deletePlatform('${platform.id}')" class="text-red-400 hover:text-red-600 transition-colors duration-200" title="Deletar Plataforma">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-neutral-200">${platform.name}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-400">${formatCurrency(getPlatformBalance(platform))}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">${actionsHtml}</td>
                 `;
                 platformsTableBody.appendChild(row);
             });
         };
-        const addPlatform = (name) => {
-            if (!currentPersonId) return;
+        
+        window.adjustPlatformBalance = (platformId) => {
             const person = people.find(p => p.id === currentPersonId);
-            const newPlatform = {
-                id: Date.now().toString(),
-                personId: currentPersonId,
-                name,
-                balance: 0
-            };
-            person.platforms.push(newPlatform);
-            savePeople();
-            renderPlatforms();
-            populatePersonSelect();
-            showMessage('Plataforma adicionada com sucesso!', 'green');
-        };
-        const deletePlatform = (id) => {
-            if (confirm('Tem certeza que deseja apagar esta plataforma? Todas as apostas e freebets vinculadas serão apagadas.')) {
-                if (!currentPersonId) return;
-                const person = people.find(p => p.id === currentPersonId);
-                person.platforms = person.platforms.filter(p => p.id !== id);
-                bets = bets.filter(bet => bet.platformId !== id);
-                unusedFreebets = unusedFreebets.filter(fb => fb.platformId !== id);
-                savePeople();
-                saveBets();
-                saveFreebets();
-                renderPlatforms();
-                populatePersonSelect();
-                showMessage('Plataforma e dados relacionados foram apagados.', 'green');
-            }
-        };
-        const adjustPlatformBalance = (personId, platformId, amount) => {
-            const person = people.find(p => p.id === personId);
             const platform = person.platforms.find(p => p.id === platformId);
             if (platform) {
-                platform.balance = (platform.balance || 0) + amount;
-                savePeople();
-                updateAll();
+                currentPlatformBalanceDisplay.textContent = formatCurrency(platform.balance);
+                currentPlatformIdInput.value = platformId;
+                transactionFormContainer.classList.remove('hidden');
+                transactionAmountInput.focus();
             }
         };
-        const toggleTransactionForm = (platformId) => {
-            const platform = people.find(p => p.id === currentPersonId).platforms.find(p => p.id === platformId);
-            transactionFormContainer.classList.remove('hidden');
-            document.getElementById('transaction-title').textContent = `Ajustar Saldo de ${platform.name}`;
-            currentPlatformIdInput.value = platformId;
-            currentPlatformBalanceDisplay.textContent = formatCurrency(getPlatformBalance(platform));
-        };
-        platformForm.addEventListener('submit', (e) => {
+
+        platformForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const platformName = document.getElementById('platform-name').value;
-            if (platformName) {
-                addPlatform(platformName);
-                platformForm.reset();
+            const person = people.find(p => p.id === currentPersonId);
+            if (person && platformName) {
+                const newPlatform = {
+                    id: Date.now().toString(),
+                    name: platformName,
+                    balance: 0
+                };
+                person.platforms.push(newPlatform);
+                savePeople();
+                renderPlatforms();
+                renderSummary();
+                
+                try {
+                    await updateDoc(doc(db, "people", person.id), { platforms: person.platforms });
+                    showMessage('Plataforma adicionada com sucesso!', 'green');
+                } catch (error) {
+                    console.error("Erro ao adicionar plataforma: ", error);
+                    showMessage('Erro ao adicionar plataforma. Tente novamente.', 'red');
+                }
             }
+            document.getElementById('platform-name').value = '';
         });
-        transactionForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const platformId = currentPlatformIdInput.value;
-            const amount = parseFloat(transactionAmountInput.value);
-            const isAdd = e.submitter.id === 'btn-add-balance';
-            
-            if (isNaN(amount) || amount <= 0) {
-                showMessage('Por favor, insira um valor válido.', 'red');
+
+        window.deletePlatform = async (platformId) => {
+            if (!confirm('Tem certeza que deseja deletar esta plataforma?')) {
                 return;
             }
-            
-            adjustPlatformBalance(currentPersonId, platformId, isAdd ? amount : -amount);
-            transactionFormContainer.classList.add('hidden');
-            transactionForm.reset();
+            const person = people.find(p => p.id === currentPersonId);
+            if (person) {
+                person.platforms = person.platforms.filter(p => p.id !== platformId);
+                savePeople();
+                renderPlatforms();
+                renderSummary();
+                
+                try {
+                    await updateDoc(doc(db, "people", person.id), { platforms: person.platforms });
+                    showMessage('Plataforma deletada com sucesso!', 'green');
+                } catch (error) {
+                    console.error("Erro ao deletar plataforma: ", error);
+                    showMessage('Erro ao deletar plataforma. Tente novamente.', 'red');
+                }
+            }
+        };
+
+        window.editPlatform = (platformId) => {
+            const person = people.find(p => p.id === currentPersonId);
+            const platform = person.platforms.find(p => p.id === platformId);
+            if (platform) {
+                const newName = prompt("Insira o novo nome para a plataforma:", platform.name);
+                if (newName && newName !== platform.name) {
+                    platform.name = newName;
+                    savePeople();
+                    renderPlatforms();
+                    renderSummary();
+                }
+            }
+        };
+
+        transactionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = parseFloat(transactionAmountInput.value.replace(',', '.')); // Garante que o valor é um número válido
+            const platformId = currentPlatformIdInput.value;
+            const person = people.find(p => p.id === currentPersonId);
+            const platform = person.platforms.find(p => p.id === platformId);
+
+            if (isNaN(amount) || !platform) {
+                showMessage('Valor inválido ou plataforma não encontrada.', 'red');
+                return;
+            }
+
+            if (e.submitter.id === 'btn-add-balance') {
+                platform.balance += amount;
+            } else if (e.submitter.id === 'btn-withdraw-balance') {
+                platform.balance -= amount;
+            }
+
+            savePeople();
             renderPlatforms();
-            showMessage('Saldo ajustado com sucesso!', 'green');
+            renderSummary();
+            transactionFormContainer.classList.add('hidden');
+            
+            try {
+                await updateDoc(doc(db, "people", person.id), { platforms: person.platforms });
+                showMessage('Saldo da plataforma ajustado com sucesso!', 'green');
+                transactionAmountInput.value = ''; // Limpa o campo após o sucesso
+            } catch (error) {
+                console.error("Erro ao ajustar saldo: ", error);
+                showMessage('Erro ao ajustar saldo. Tente novamente.', 'red');
+            }
         });
+
+        // --- Lógica da Aba Freebets ---
+        const saveFreebets = () => {
+            localStorage.setItem(LOCAL_STORAGE_FREEBETS_KEY, JSON.stringify(unusedFreebets));
+        };
+
+        const loadFreebets = () => {
+            const savedFreebets = localStorage.getItem(LOCAL_STORAGE_FREEBETS_KEY);
+            if (savedFreebets) {
+                unusedFreebets = JSON.parse(savedFreebets);
+            }
+        };
+        
+        const renderUnusedFreebets = () => {
+            freebetsTableBody.innerHTML = '';
+            unusedFreebets.forEach((fb, index) => {
+                const actionsHtml = `
+                    <div class="flex items-center space-x-2">
+                        <button onclick="useFreebet(${index})" class="px-2 py-1 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors duration-200">
+                            Usar
+                        </button>
+                        <button onclick="deleteFreebet(${index})" class="p-1 bg-red-700 text-white rounded-full hover:bg-red-600 transition-colors duration-200" title="Deletar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-zinc-800', 'transition-colors', 'duration-200');
+                row.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${fb.personName}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${fb.platformName}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${formatCurrency(fb.stake)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${fb.received === 'sim' ? 'Sim' : 'Não'}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-neutral-400">${fb.expiration || 'N/A'}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">${actionsHtml}</td>
+                `;
+                freebetsTableBody.appendChild(row);
+            });
+        };
+
+        freebetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const personId = freebetPersonSelect.value;
+            const personName = freebetPersonSelect.options[freebetPersonSelect.selectedIndex].textContent;
+            const platformId = freebetPlatformSelect.value;
+            const platformName = freebetPlatformSelect.options[freebetPlatformSelect.selectedIndex].textContent;
+            const stake = parseFloat(freebetStakeInput.value);
+            const quantity = parseInt(freebetQuantityInput.value);
+            const received = freebetReceivedSelect.value;
+            const expiration = freebetExpirationInput.value;
+
+            for (let i = 0; i < quantity; i++) {
+                const newFreebet = {
+                    personId,
+                    personName,
+                    platformId,
+                    platformName,
+                    stake,
+                    received,
+                    expiration,
+                    id: Date.now().toString() + '-' + i,
+                    timestamp: Date.now()
+                };
+                unusedFreebets.push(newFreebet);
+            }
+            saveFreebets();
+            renderUnusedFreebets();
+            freebetForm.reset();
+            
+            try {
+                // Adiciona a freebet ao Firebase
+                const docRef = await addDoc(collection(db, "freebets"), { personId, personName, platformId, platformName, stake, quantity, received, expiration, userId: auth.currentUser.uid });
+                showMessage('Freebet(s) adicionada(s) com sucesso!', 'green');
+            } catch (error) {
+                console.error("Erro ao adicionar freebet: ", error);
+                showMessage('Erro ao adicionar freebet. Tente novamente.', 'red');
+            }
+        });
+
+        window.useFreebet = (index) => {
+            const freebetToUse = unusedFreebets[index];
+            dateInput.value = new Date().toISOString().slice(0, 10);
+            descriptionInput.value = 'Freebet - ' + freebetToUse.platformName;
+            personSelect.value = freebetToUse.personId;
+            populatePlatformSelect(freebetToUse.personId, platformSelect, freebetToUse.platformName);
+            typeSelect.value = 'Freebet';
+            stakeInput.value = freebetToUse.stake;
+            oddsInput.value = '';
+            resultSelect.value = 'Aberta FB';
+            
+            // Remove a freebet da lista
+            unusedFreebets.splice(index, 1);
+            saveFreebets();
+            renderUnusedFreebets();
+            switchTab('tab-gerenciador');
+            
+            try {
+                deleteDoc(doc(db, "freebets", freebetToUse.id));
+                showMessage('Freebet movida para o formulário. Não se esqueça de preencher as odds e o resultado!', 'green');
+            } catch (error) {
+                console.error("Erro ao usar freebet: ", error);
+                showMessage('Erro ao usar freebet. Tente novamente.', 'red');
+            }
+        };
+
+        window.deleteFreebet = async (index) => {
+            if (!confirm('Tem certeza que deseja deletar esta freebet?')) {
+                return;
+            }
+            const freebetToDelete = unusedFreebets[index];
+            unusedFreebets.splice(index, 1);
+            saveFreebets();
+            renderUnusedFreebets();
+            
+            try {
+                await deleteDoc(doc(db, "freebets", freebetToDelete.id));
+                showMessage('Freebet deletada com sucesso!', 'green');
+            } catch (error) {
+                console.error("Erro ao deletar freebet: ", error);
+                showMessage('Erro ao deletar freebet. Tente novamente.', 'red');
+            }
+        };
 
         // --- Lógica da Aba Ganhos ---
         const renderProfitAnalysis = () => {
-            const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB' && bet.result !== 'Red FB');
-
-            if (finishedBets.length === 0) {
-                noProfitDataMsg.classList.remove('hidden');
-                dailyList.innerHTML = '';
-                monthlyList.innerHTML = '';
-                annualList.innerHTML = '';
-                return;
-            }
-            noProfitDataMsg.classList.add('hidden');
-
             const dailyProfits = {};
             const monthlyProfits = {};
             const annualProfits = {};
-
-            finishedBets.forEach(bet => {
-                const date = bet.date;
-                const [year, month, day] = date.split('-');
-                const lucro = calculateProfit(calculateReturn(bet.stake, bet.odds, bet.result), bet.stake, bet.type, bet.result);
-
-                // Diário
-                if (!dailyProfits[date]) dailyProfits[date] = 0;
-                dailyProfits[date] += lucro;
-
-                // Mensal
-                const monthYear = `${year}-${month}`;
-                if (!monthlyProfits[monthYear]) monthlyProfits[monthYear] = 0;
-                monthlyProfits[monthYear] += lucro;
-
-                // Anual
-                if (!annualProfits[year]) annualProfits[year] = 0;
-                annualProfits[year] += lucro;
+            
+            bets.forEach(bet => {
+                if (bet.result !== 'Aberta' && bet.result !== 'Aberta FB' && bet.result !== 'Red FB') {
+                    const retorno = calculateReturn(bet.stake, bet.odds, bet.result);
+                    const lucro = calculateProfit(retorno, bet.stake, bet.type, bet.result);
+                    const date = new Date(bet.date + 'T12:00:00.000Z');
+                    
+                    // Ganhos Diários
+                    const dayKey = date.toISOString().split('T')[0];
+                    if (!dailyProfits[dayKey]) dailyProfits[dayKey] = 0;
+                    dailyProfits[dayKey] += lucro;
+                    
+                    // Ganhos Mensais
+                    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                    if (!monthlyProfits[monthKey]) monthlyProfits[monthKey] = 0;
+                    monthlyProfits[monthKey] += lucro;
+                    
+                    // Ganhos Anuais
+                    const yearKey = date.getFullYear();
+                    if (!annualProfits[yearKey]) annualProfits[yearKey] = 0;
+                    annualProfits[yearKey] += lucro;
+                } else if (bet.result === 'Red FB') {
+                    const lucro = calculateProfit(0, bet.stake, bet.type, bet.result);
+                    const date = new Date(bet.date + 'T12:00:00.000Z');
+                    
+                    const dayKey = date.toISOString().split('T')[0];
+                    if (!dailyProfits[dayKey]) dailyProfits[dayKey] = 0;
+                    dailyProfits[dayKey] += lucro;
+                    
+                    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                    if (!monthlyProfits[monthKey]) monthlyProfits[monthKey] = 0;
+                    monthlyProfits[monthKey] += lucro;
+                    
+                    const yearKey = date.getFullYear();
+                    if (!annualProfits[yearKey]) annualProfits[yearKey] = 0;
+                    annualProfits[yearKey] += lucro;
+                }
             });
+            
+            // Renderiza listas
+            const renderList = (listElement, profits) => {
+                listElement.innerHTML = '';
+                if (Object.keys(profits).length === 0) {
+                    return false;
+                }
+                const sortedKeys = Object.keys(profits).sort().reverse();
+                sortedKeys.forEach(key => {
+                    const li = document.createElement('li');
+                    li.classList.add('flex', 'justify-between', 'items-center', 'p-3', 'bg-zinc-700', 'rounded-lg', 'shadow-sm', 'hover:bg-zinc-600', 'transition-colors');
+                    li.innerHTML = `
+                        <span class="text-neutral-300 font-medium">${key}</span>
+                        <span class="font-bold ${profits[key] >= 0 ? 'text-green-400' : 'text-red-400'}">${formatCurrency(profits[key])}</span>
+                    `;
+                    listElement.appendChild(li);
+                });
+                return true;
+            };
 
-            // Renderiza Ganhos Diários
-            dailyList.innerHTML = '';
-            Object.entries(dailyProfits).sort().forEach(([date, profit]) => {
-                const li = document.createElement('li');
-                const profitClass = profit >= 0 ? 'text-green-400' : 'text-red-400';
-                li.innerHTML = `<span class="font-semibold">${date}:</span> <span class="${profitClass}">${formatCurrency(profit)}</span>`;
-                dailyList.appendChild(li);
-            });
-
-            // Renderiza Ganhos Mensais
-            monthlyList.innerHTML = '';
-            Object.entries(monthlyProfits).sort().forEach(([monthYear, profit]) => {
-                const li = document.createElement('li');
-                const profitClass = profit >= 0 ? 'text-green-400' : 'text-red-400';
-                li.innerHTML = `<span class="font-semibold">${monthYear}:</span> <span class="${profitClass}">${formatCurrency(profit)}</span>`;
-                monthlyList.appendChild(li);
-            });
-
-            // Renderiza Ganhos Anuais
-            annualList.innerHTML = '';
-            Object.entries(annualProfits).sort().forEach(([year, profit]) => {
-                const li = document.createElement('li');
-                const profitClass = profit >= 0 ? 'text-green-400' : 'text-red-400';
-                li.innerHTML = `<span class="font-semibold">${year}:</span> <span class="${profitClass}">${formatCurrency(profit)}</span>`;
-                annualList.appendChild(li);
-            });
+            const hasData = renderList(dailyList, dailyProfits) || renderList(monthlyList, monthlyProfits) || renderList(annualList, annualProfits);
+            if (!hasData) {
+                noProfitDataMsg.classList.remove('hidden');
+            } else {
+                noProfitDataMsg.classList.add('hidden');
+            }
         };
 
-        // Função de inicialização e atualização
+        // --- Inicialização ---
         const updateAll = () => {
+            renderSummary();
             renderOpenBets();
             renderHistoryBets();
-            renderSummary();
-            renderUnusedFreebets();
             renderPeople();
+            renderUnusedFreebets();
             renderProfitAnalysis();
-            populatePersonSelect();
         };
 
-        // Adiciona um listener para o estado de autenticação
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Usuário está logado
+                console.log("Usuário logado:", user.email);
                 authContainer.style.display = 'none';
                 mainContent.style.display = 'block';
-                console.log("Usuário logado:", user.email);
                 loadBets();
                 loadPeople();
                 loadFreebets();
