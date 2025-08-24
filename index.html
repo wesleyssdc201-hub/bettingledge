@@ -401,14 +401,11 @@
     </div>
 
     <script type="module">
-    
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
 <script>
     // Configuração pública do Firebase
-    // ESTE CÓDIGO É NECESSÁRIO PARA O SITE SE CONECTAR AO FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
         authDomain: "betting-ledger-558f2.firebaseapp.com",
@@ -418,12 +415,12 @@
         appId: "1:68773956884:web:1bd90aba9cefede5c88601"
     };
 
-    // Inicialize o Firebase Client SDK
+    // Inicialize o Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Referências do DOM
+    // Referências do DOM (Login e Cadastro)
     const authContainer = document.getElementById('auth-container');
     const mainContent = document.getElementById('main-content');
     const emailInput = document.getElementById('email');
@@ -443,6 +440,10 @@
             console.log("Usuário logado:", user.email);
             authContainer.style.display = 'none';
             mainContent.style.display = 'block';
+            loadBets();
+            loadPeople();
+            loadFreebets();
+            updateAll();
         } else {
             authContainer.style.display = 'block';
             mainContent.style.display = 'none';
@@ -466,149 +467,153 @@
         }
     });
 
-// Eventos dos Botões de Login e Cadastro (agora com a requisição para a API)
-        registerButton.addEventListener('click', () => {
-            const email = registerEmailInput.value;
-            const password = registerPasswordInput.value;
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    alert('Cadastro realizado com sucesso! Pode entrar.');
-                    registerModal.style.display = 'none';
-                })
-                .catch((error) => {
-                    alert('Erro ao cadastrar: ' + error.message);
-                });
-        });
+    // Eventos dos Botões de Login e Cadastro (agora com a requisição para a API)
+    registerButton.addEventListener('click', () => {
+        const email = registerEmailInput.value;
+        const password = registerPasswordInput.value;
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                alert('Cadastro realizado com sucesso! Pode entrar.');
+                registerModal.style.display = 'none';
+            })
+            .catch((error) => {
+                alert('Erro ao cadastrar: ' + error.message);
+            });
+    });
 
-        loginButton.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
+    loginButton.addEventListener('click', async () => {
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message);
-                }
-
-                const { customToken } = await response.json();
-                
-                // Entra no sistema usando o token seguro
-                await firebase.auth().signInWithCustomToken(customToken);
-
-                alert('Login realizado com sucesso!');
-            } catch (error) {
-                alert('Erro ao fazer login: ' + error.message);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message);
             }
-        });
 
-        // Variáveis globais
-        let bets = [];
-        let people = [];
-        let unusedFreebets = [];
-        let currentPersonId = null;
-        let isEditingBetIndex = -1; // -1 significa que não está editando
+            const { customToken } = await response.json();
+            
+            // Entra no sistema usando o token seguro
+            await firebase.auth().signInWithCustomToken(customToken);
 
-        // Chaves para o localStorage
-        const LOCAL_STORAGE_BETS_KEY = 'bankrollBets';
-        const LOCAL_STORAGE_PEOPLE_KEY = 'bankrollPeople';
-        const LOCAL_STORAGE_FREEBETS_KEY = 'unusedFreebets';
+            alert('Login realizado com sucesso!');
+        } catch (error) {
+            alert('Erro ao fazer login: ' + error.message);
+        }
+    });
 
-        // Elementos do DOM (Abas)
-        const btnTabGerenciador = document.getElementById('btn-tab-gerenciador');
-        const btnTabHistorico = document.getElementById('btn-tab-historico');
-        const btnTabFreebets = document.getElementById('btn-tab-freebets');
-        const btnTabPessoas = document.getElementById('btn-tab-pessoas');
-        const btnTabGanhos = document.getElementById('btn-tab-ganhos');
-        const tabGerenciador = document.getElementById('tab-gerenciador');
-        const tabHistorico = document.getElementById('tab-historico');
-        const tabFreebets = document.getElementById('tab-freebets');
-        const tabPessoas = document.getElementById('tab-pessoas');
-        const tabGanhos = document.getElementById('tab-ganhos');
-        
-        // Elementos do DOM (Aba Apostas)
-        const form = document.getElementById('bet-form');
-        const formTitle = document.getElementById('bet-form-title');
-        const formButton = document.getElementById('bet-form-button');
-        const dateInput = document.getElementById('date');
-        const descriptionInput = document.getElementById('description');
-        const personSelect = document.getElementById('person');
-        const platformSelect = document.getElementById('platform');
-        const typeSelect = document.getElementById('type');
-        const stakeInput = document.getElementById('stake');
-        const oddsInput = document.getElementById('odds');
-        const resultSelect = document.getElementById('result');
-        const betsTableBody = document.getElementById('bets-table-body');
-        const currentBankrollDisplay = document.getElementById('current-bankroll');
-        const profitLossDisplay = document.getElementById('profit-loss');
-        const totalBetsDisplay = document.getElementById('total-bets');
-        const roiDisplay = document.getElementById('roi');
-        const messageBox = document.getElementById('message-box');
-        const clearBetDataBtn = document.getElementById('clear-bet-data-btn');
+    // Variáveis globais (da sua planilha)
+    let bets = [];
+    let people = [];
+    let unusedFreebets = [];
+    let currentPersonId = null;
+    let isEditingBetIndex = -1;
+    
+    // Chaves para o localStorage
+    const LOCAL_STORAGE_BETS_KEY = 'bankrollBets';
+    const LOCAL_STORAGE_PEOPLE_KEY = 'bankrollPeople';
+    const LOCAL_STORAGE_FREEBETS_KEY = 'unusedFreebets';
 
-        // Elementos do DOM (Aba Histórico)
-        const historyTableBody = document.getElementById('history-table-body');
+    // Elementos do DOM (Abas)
+    const btnTabGerenciador = document.getElementById('btn-tab-gerenciador');
+    const btnTabHistorico = document.getElementById('btn-tab-historico');
+    const btnTabFreebets = document.getElementById('btn-tab-freebets');
+    const btnTabPessoas = document.getElementById('btn-tab-pessoas');
+    const btnTabGanhos = document.getElementById('btn-tab-ganhos');
+    const tabGerenciador = document.getElementById('tab-gerenciador');
+    const tabHistorico = document.getElementById('tab-historico');
+    const tabFreebets = document.getElementById('tab-freebets');
+    const tabPessoas = document.getElementById('tab-pessoas');
+    const tabGanhos = document.getElementById('tab-ganhos');
 
-        // Elementos do DOM (Aba Freebets)
-        const freebetForm = document.getElementById('freebet-form');
-        const freebetPersonSelect = document.getElementById('freebet-person');
-        const freebetPlatformSelect = document.getElementById('freebet-platform');
-        const freebetStakeInput = document.getElementById('freebet-stake');
-        const freebetQuantityInput = document.getElementById('freebet-quantity');
-        const freebetReceivedSelect = document.getElementById('freebet-received');
-        const freebetExpirationInput = document.getElementById('freebet-expiration');
-        const freebetsTableBody = document.getElementById('freebets-table-body');
-        
-        // Elementos do DOM (Aba Pessoas)
-        const peopleListView = document.getElementById('people-list-view');
-        const platformsManagementView = document.getElementById('platforms-management-view');
-        const personForm = document.getElementById('person-form');
-        const peopleTableBody = document.getElementById('people-table-body');
-        const clearPeopleBtn = document.getElementById('clear-people-btn');
-        const backToPeopleBtn = document.getElementById('back-to-people-btn');
-        const currentPersonName = document.getElementById('current-person-name');
-        const platformForm = document.getElementById('platform-form');
-        const platformsTableBody = document.getElementById('platforms-table-body');
-        const transactionFormContainer = document.getElementById('transaction-form-container');
-        const transactionForm = document.getElementById('transaction-form');
-        const transactionAmountInput = document.getElementById('transaction-amount');
-        const currentPlatformIdInput = document.getElementById('current-platform-id');
-        const currentPlatformBalanceDisplay = document.getElementById('current-platform-balance');
+    // Elementos do DOM (Aba Apostas)
+    const form = document.getElementById('bet-form');
+    const formTitle = document.getElementById('bet-form-title');
+    const formButton = document.getElementById('bet-form-button');
+    const dateInput = document.getElementById('date');
+    const descriptionInput = document.getElementById('description');
+    const personSelect = document.getElementById('person');
+    const platformSelect = document.getElementById('platform');
+    const typeSelect = document.getElementById('type');
+    const stakeInput = document.getElementById('stake');
+    const oddsInput = document.getElementById('odds');
+    const resultSelect = document.getElementById('result');
+    const betsTableBody = document.getElementById('bets-table-body');
+    const currentBankrollDisplay = document.getElementById('current-bankroll');
+    const profitLossDisplay = document.getElementById('profit-loss');
+    const totalBetsDisplay = document.getElementById('total-bets');
+    const roiDisplay = document.getElementById('roi');
+    const messageBox = document.getElementById('message-box');
+    const clearBetDataBtn = document.getElementById('clear-bet-data-btn');
 
-        // Elementos do DOM (Aba Ganhos)
-        const dailyList = document.getElementById('daily-list');
-        const monthlyList = document.getElementById('monthly-list');
-        const annualList = document.getElementById('annual-list');
-        const noProfitDataMsg = document.getElementById('no-profit-data');
+    // Elementos do DOM (Aba Histórico)
+    const historyTableBody = document.getElementById('history-table-body');
 
-        // Funções de Utilitários
-        const formatCurrency = (value) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        };
-        const showMessage = (message, type) => {
-            messageBox.textContent = message;
-            messageBox.style.backgroundColor = type === 'green' ? '#262626' : '#262626';
-            messageBox.style.color = type === 'green' ? '#E5E5E5' : '#A3A3A3';
-            messageBox.classList.remove('hidden');
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 3000);
-        };
+    // Elementos do DOM (Aba Freebets)
+    const freebetForm = document.getElementById('freebet-form');
+    const freebetPersonSelect = document.getElementById('freebet-person');
+    const freebetPlatformSelect = document.getElementById('freebet-platform');
+    const freebetStakeInput = document.getElementById('freebet-stake');
+    const freebetQuantityInput = document.getElementById('freebet-quantity');
+    const freebetReceivedSelect = document.getElementById('freebet-received');
+    const freebetExpirationInput = document.getElementById('freebet-expiration');
+    const freebetsTableBody = document.getElementById('freebets-table-body');
 
-        const resetForm = () => {
-            form.reset();
-            isEditingBetIndex = -1;
-            formTitle.textContent = 'Adicionar Nova Aposta';
-            formButton.textContent = 'Adicionar Aposta';
-            populatePersonSelect();
-        };
+    // Elementos do DOM (Aba Pessoas)
+    const peopleListView = document.getElementById('people-list-view');
+    const platformsManagementView = document.getElementById('platforms-management-view');
+    const personForm = document.getElementById('person-form');
+    const peopleTableBody = document.getElementById('people-table-body');
+    const clearPeopleBtn = document.getElementById('clear-people-btn');
+    const backToPeopleBtn = document.getElementById('back-to-people-btn');
+    const currentPersonName = document.getElementById('current-person-name');
+    const platformForm = document.getElementById('platform-form');
+    const platformsTableBody = document.getElementById('platforms-table-body');
+    const transactionFormContainer = document.getElementById('transaction-form-container');
+    const transactionForm = document.getElementById('transaction-form');
+    const transactionAmountInput = document.getElementById('transaction-amount');
+    const currentPlatformIdInput = document.getElementById('current-platform-id');
+    const currentPlatformBalanceDisplay = document.getElementById('current-platform-balance');
+
+    // Elementos do DOM (Aba Ganhos)
+    const dailyList = document.getElementById('daily-list');
+    const monthlyList = document.getElementById('monthly-list');
+    const annualList = document.getElementById('annual-list');
+    const noProfitDataMsg = document.getElementById('no-profit-data');
+
+    // Funções de Utilitários
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    };
+
+    const showMessage = (message, type) => {
+        messageBox.textContent = message;
+        messageBox.style.backgroundColor = type === 'green' ? '#262626' : '#262626';
+        messageBox.style.color = type === 'green' ? '#E5E5E5' : '#A3A3A3';
+        messageBox.classList.remove('hidden');
+        setTimeout(() => {
+            messageBox.classList.add('hidden');
+        }, 3000);
+    };
+
+    const resetForm = () => {
+        form.reset();
+        isEditingBetIndex = -1;
+        formTitle.textContent = 'Adicionar Nova Aposta';
+        formButton.textContent = 'Adicionar Aposta';
+        resultSelect.value = "";
+        stakeInput.classList.remove('text-red-400');
+        oddsInput.classList.remove('text-red-400');
+        descriptionInput.focus();
+    };
 
         const populatePersonSelect = () => {
             const selects = [personSelect, freebetPersonSelect];
