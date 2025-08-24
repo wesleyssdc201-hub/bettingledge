@@ -401,6 +401,113 @@
     </div>
 
     <script type="module">
+    
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+    // Configuração pública do Firebase
+    // ESTE CÓDIGO É NECESSÁRIO PARA O SITE SE CONECTAR AO FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
+        authDomain: "betting-ledger-558f2.firebaseapp.com",
+        projectId: "betting-ledger-558f2",
+        storageBucket: "betting-ledger-558f2.firebasestorage.app",
+        messagingSenderId: "68773956884",
+        appId: "1:68773956884:web:1bd90aba9cefede5c88601"
+    };
+
+    // Inicialize o Firebase Client SDK
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Referências do DOM
+    const authContainer = document.getElementById('auth-container');
+    const mainContent = document.getElementById('main-content');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('login-button');
+
+    const registerModal = document.getElementById('register-modal');
+    const showRegisterModalButton = document.getElementById('show-register-modal');
+    const closeRegisterModalButton = document.getElementById('close-register-modal');
+    const registerButton = document.getElementById('register-button');
+    const registerEmailInput = document.getElementById('register-email');
+    const registerPasswordInput = document.getElementById('register-password');
+
+    // Estado de Autenticação
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log("Usuário logado:", user.email);
+            authContainer.style.display = 'none';
+            mainContent.style.display = 'block';
+        } else {
+            authContainer.style.display = 'block';
+            mainContent.style.display = 'none';
+            console.log("Nenhum usuário logado.");
+        }
+    });
+
+    // Eventos para o Modal de Cadastro
+    showRegisterModalButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        registerModal.style.display = 'flex';
+    });
+
+    closeRegisterModalButton.addEventListener('click', () => {
+        registerModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === registerModal) {
+            registerModal.style.display = 'none';
+        }
+    });
+
+// Eventos dos Botões de Login e Cadastro (agora com a requisição para a API)
+        registerButton.addEventListener('click', () => {
+            const email = registerEmailInput.value;
+            const password = registerPasswordInput.value;
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    alert('Cadastro realizado com sucesso! Pode entrar.');
+                    registerModal.style.display = 'none';
+                })
+                .catch((error) => {
+                    alert('Erro ao cadastrar: ' + error.message);
+                });
+        });
+
+        loginButton.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message);
+                }
+
+                const { customToken } = await response.json();
+                
+                // Entra no sistema usando o token seguro
+                await firebase.auth().signInWithCustomToken(customToken);
+
+                alert('Login realizado com sucesso!');
+            } catch (error) {
+                alert('Erro ao fazer login: ' + error.message);
+            }
+        });
 
         // Variáveis globais
         let bets = [];
@@ -1414,113 +1521,6 @@
                 authContainer.style.display = 'block';
                 mainContent.style.display = 'none';
                 console.log("Nenhum usuário logado.");
-            }
-        });
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<script>
-    // Configuração pública do Firebase
-    // ESTE CÓDIGO É NECESSÁRIO PARA O SITE SE CONECTAR AO FIREBASE
-    const firebaseConfig = {
-        apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
-        authDomain: "betting-ledger-558f2.firebaseapp.com",
-        projectId: "betting-ledger-558f2",
-        storageBucket: "betting-ledger-558f2.firebasestorage.app",
-        messagingSenderId: "68773956884",
-        appId: "1:68773956884:web:1bd90aba9cefede5c88601"
-    };
-
-    // Inicialize o Firebase Client SDK
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Referências do DOM
-    const authContainer = document.getElementById('auth-container');
-    const mainContent = document.getElementById('main-content');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const loginButton = document.getElementById('login-button');
-
-    const registerModal = document.getElementById('register-modal');
-    const showRegisterModalButton = document.getElementById('show-register-modal');
-    const closeRegisterModalButton = document.getElementById('close-register-modal');
-    const registerButton = document.getElementById('register-button');
-    const registerEmailInput = document.getElementById('register-email');
-    const registerPasswordInput = document.getElementById('register-password');
-
-    // Estado de Autenticação
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log("Usuário logado:", user.email);
-            authContainer.style.display = 'none';
-            mainContent.style.display = 'block';
-        } else {
-            authContainer.style.display = 'block';
-            mainContent.style.display = 'none';
-            console.log("Nenhum usuário logado.");
-        }
-    });
-
-    // Eventos para o Modal de Cadastro
-    showRegisterModalButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        registerModal.style.display = 'flex';
-    });
-
-    closeRegisterModalButton.addEventListener('click', () => {
-        registerModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
-        if (event.target === registerModal) {
-            registerModal.style.display = 'none';
-        }
-    });
-
-// Eventos dos Botões de Login e Cadastro (agora com a requisição para a API)
-        registerButton.addEventListener('click', () => {
-            const email = registerEmailInput.value;
-            const password = registerPasswordInput.value;
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    alert('Cadastro realizado com sucesso! Pode entrar.');
-                    registerModal.style.display = 'none';
-                })
-                .catch((error) => {
-                    alert('Erro ao cadastrar: ' + error.message);
-                });
-        });
-
-        loginButton.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message);
-                }
-
-                const { customToken } = await response.json();
-                
-                // Entra no sistema usando o token seguro
-                await firebase.auth().signInWithCustomToken(customToken);
-
-                alert('Login realizado com sucesso!');
-            } catch (error) {
-                alert('Erro ao fazer login: ' + error.message);
             }
         });
 
