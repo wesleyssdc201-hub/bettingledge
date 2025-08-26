@@ -2,6 +2,9 @@
   "functions": {
     "api/config.js": {
       "runtime": "nodejs18.x"
+    },
+    "api/login.js": {
+      "runtime": "nodejs18.x"
     }
   }
 }
