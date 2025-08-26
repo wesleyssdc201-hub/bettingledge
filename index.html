@@ -252,7 +252,7 @@
     let freebets = [];
     let currentPersonId = null;
 
-    [cite_start]// CONFIGURAÇÃO DO FIREBASE (INSERIDA DIRETAMENTE) [cite: 1]
+    // CONFIGURAÇÃO DO FIREBASE (INSERIDA DIRETAMENTE)
     const firebaseConfig = {
       apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
       authDomain: "betting-ledger-558f2.firebaseapp.com",
@@ -339,7 +339,6 @@
         if(betForm) {
             betForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                // ... (resto do seu código do formulário de aposta) ...
                 const date = document.getElementById('date').value;
                 const description = document.getElementById('description').value;
                 const personId = personSelect.value;
@@ -371,9 +370,9 @@
                         date,
                         description,
                         personId,
-                        personName: 'Nome da Pessoa', // Aqui precisa ser corrigido para a pessoa real
+                        personName: 'Nome da Pessoa',
                         platformId,
-                        platformName: 'Nome da Plataforma', // Aqui precisa ser corrigido para a plataforma real
+                        platformName: 'Nome da Plataforma',
                         type,
                         stake,
                         odds,
