@@ -169,20 +169,10 @@
                         </div>
                         <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
                             Adicionar Pessoa
-                        </button>                      
+                        </button>
                     </form>
                 </div>
                 
-                <div id="tab-pessoas" class="tab-content">
-    <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
-        <h2 class="text-xl font-bold mb-4 text-white">Adicionar Pessoas & Plataformas</h2>
-        <form id="person-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            </form>
-        <button onclick="importDataToFirebase()" class="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors mt-4">
-            Importar Dados do Backup
-        </button>
-    </div>
-    </div>
                 <div class="bg-zinc-800 p-4 rounded-lg shadow-lg">
                     <h3 class="text-lg font-semibold mb-4">Adicionar Nova Plataforma</h3>
                     <form id="addPlatformForm" class="space-y-4">
@@ -201,8 +191,7 @@
                         </button>
                     </form>
                 </div>
-
-
+                
                 <div class="col-span-1 md:col-span-2 bg-zinc-800 p-4 rounded-lg shadow-lg">
                     <h3 class="text-lg font-semibold mb-4">Gerenciar Depósitos e Saques</h3>
                     <form id="addTransactionForm" class="space-y-4">
@@ -241,7 +230,11 @@
                 </div>
             </div>
 
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-lg">
+            <button onclick="importDataToFirebase()" class="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors mt-4">
+                Importar Dados do Backup
+            </button>
+
+            <div class="bg-zinc-800 p-4 rounded-lg shadow-lg mt-8">
                 <h3 class="text-lg font-semibold mb-4">Pessoas & Plataformas</h3>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-zinc-700">
@@ -355,8 +348,7 @@
             [betPersonSelect, platformPersonSelect, transactionPersonSelect].forEach(select => {
                 select.innerHTML = '<option value="">Selecione uma pessoa</option>';
             });
-            transactionPlatformSelect.innerHTML = '<option value="">Selecione uma plataforma</option>';
-
+            
             people.forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.id;
@@ -399,61 +391,6 @@
             await loadTransactions();
             loadFreebets();
             loadWithdrawals();
-
-const importDataToFirebase = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json';
-
-    input.onchange = async (event) => {
-        const file = event.target.files[0];
-        if (!file) {
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const importedData = JSON.parse(e.target.result);
-                const batch = db.batch();
-
-                // Adicionar Pessoas e Plataformas
-                if (importedData.people) {
-                    importedData.people.forEach(person => {
-                        const newPersonRef = doc(db, `users/${auth.currentUser.uid}/people`, person.id);
-                        batch.set(newPersonRef, { name: person.name, platforms: person.platforms });
-                    });
-                }
-
-                // Adicionar Apostas
-                if (importedData.bets) {
-                    importedData.bets.forEach(bet => {
-                        const newBetRef = doc(db, `users/${auth.currentUser.uid}/bets`, bet.id);
-                        batch.set(newBetRef, bet);
-                    });
-                }
-                
-                // Adicionar Freebets (se existirem)
-                if (importedData.freebets) {
-                     importedData.freebets.forEach(freebet => {
-                         const newFreebetRef = doc(db, `users/${auth.currentUser.uid}/freebets`, freebet.id);
-                         batch.set(newFreebetRef, freebet);
-                     });
-                 }
-                
-                await batch.commit();
-                alert('Dados importados com sucesso para o Firebase!');
-                updateAll();
-            } catch (error) {
-                alert('Erro ao importar o arquivo. Verifique se o arquivo JSON está no formato correto.');
-                console.error('Erro ao ler ou importar o arquivo JSON:', error);
-            }
-        };
-        reader.readAsText(file);
-    };
-
-    input.click();
-};
 
             // Calcular saldos
             const platformBalances = {};
@@ -722,6 +659,62 @@ const importDataToFirebase = () => {
             }
             }
         });
+
+        // Função para importar dados do JSON para o Firebase
+        const importDataToFirebase = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+
+            input.onchange = async (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        const batch = db.batch();
+
+                        // Adicionar Pessoas e Plataformas
+                        if (importedData.people) {
+                            importedData.people.forEach(person => {
+                                const newPersonRef = doc(db, `users/${auth.currentUser.uid}/people`, person.id);
+                                batch.set(newPersonRef, { name: person.name, platforms: person.platforms });
+                            });
+                        }
+
+                        // Adicionar Apostas
+                        if (importedData.bets) {
+                            importedData.bets.forEach(bet => {
+                                const newBetRef = doc(db, `users/${auth.currentUser.uid}/bets`, bet.id);
+                                batch.set(newBetRef, bet);
+                            });
+                        }
+                        
+                        // Adicionar Freebets (se existirem)
+                        if (importedData.freebets) {
+                            importedData.freebets.forEach(freebet => {
+                                const newFreebetRef = doc(db, `users/${auth.currentUser.uid}/freebets`, freebet.id);
+                                batch.set(newFreebetRef, freebet);
+                            });
+                        }
+                        
+                        await batch.commit();
+                        alert('Dados importados com sucesso para o Firebase!');
+                        updateAll();
+                    } catch (error) {
+                        alert('Erro ao importar o arquivo. Verifique se o arquivo JSON está no formato correto.');
+                        console.error('Erro ao ler ou importar o arquivo JSON:', error);
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            input.click();
+        };
 
         // Autenticação e Carregamento
         auth.onAuthStateChanged(user => {
