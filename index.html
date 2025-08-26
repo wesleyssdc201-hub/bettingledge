@@ -390,17 +390,13 @@
 </button>
 
 <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const firebaseConfig = {
-      // Sua configuração do Firebase aqui
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+    let db;
+    let auth;
 
     const authContainer = document.getElementById('auth-container');
     const mainContent = document.querySelector('.container');
@@ -420,7 +416,10 @@
     const transactionTypeSelect = document.getElementById('transaction-type');
     const transactionAmountInput = document.getElementById('transaction-amount');
     const clearPeopleBtn = document.getElementById('clear-people-btn');
-
+    const betForm = document.getElementById('bet-form');
+    const personSelect = document.getElementById('person');
+    const platformSelect = document.getElementById('platform');
+    
     // Funções de Utilitário
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
@@ -432,6 +431,40 @@
     let freebets = [];
     let currentPersonId = null;
 
+    // Função para inicializar o app com as chaves do Vercel
+    async function initializeFirebase() {
+        try {
+            const response = await fetch('/api/config.js');
+            const firebaseConfig = await response.json();
+            
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            // Inicia o listener de autenticação APÓS o Firebase ser inicializado
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    authContainer.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    signOutButton.classList.remove('hidden');
+                    console.log("Usuário logado:", user.email);
+                    loadBets();
+                    loadPeople();
+                    loadFreebets();
+                    updateAll();
+                } else {
+                    authContainer.style.display = 'block';
+                    mainContent.style.display = 'none';
+                    signOutButton.classList.add('hidden');
+                    console.log("Nenhum usuário logado.");
+                }
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar a configuração do Firebase:", error);
+            alert("Erro ao carregar a aplicação. Por favor, tente novamente mais tarde.");
+        }
+    }
     // Funções de Renderização
     const renderBets = (betsToRender) => {
         const betsTableBody = document.getElementById('bets-table-body');
