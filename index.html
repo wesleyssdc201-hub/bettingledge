@@ -414,6 +414,108 @@
     const loginButton = document.getElementById('login-button');
     const registerButton = document.getElementById('register-button');
 
+    const renderPlatforms = (platforms) => {
+        const platformsTableBody = document.getElementById('platforms-table-body');
+        if (!platformsTableBody) return;
+        platformsTableBody.innerHTML = '';
+        platforms.forEach(platform => {
+            const row = document.createElement('tr');
+            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
+            row.innerHTML = `
+                <td class="px-4 py-2 text-sm text-neutral-400">${platform.name}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${platform.type}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400 font-semibold">${formatCurrency(platform.balance)}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                    <button class="edit-platform-btn bg-yellow-500 text-white px-2 py-1 rounded-md text-xs hover:bg-yellow-600 transition duration-300" data-id="${platform.id}">
+                        <i class="fas fa-edit"></i> Ajustar Saldo
+                    </button>
+                    <button class="delete-platform-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${platform.id}">
+                        <i class="fas fa-trash-alt"></i> Deletar
+                    </button>
+                </td>
+            `;
+            platformsTableBody.appendChild(row);
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authContainer.style.display = 'none';
+                mainContent.style.display = 'block';
+                console.log("Usuário logado:", user.email);
+                loadBets();
+                loadPeople();
+                loadFreebets();
+                updateAll();
+
+                // Lógica dos botões de plataforma movida para dentro de DOMContentLoaded
+                const platformsTableBody = document.getElementById('platforms-table-body');
+                if (platformsTableBody) {
+                    platformsTableBody.addEventListener('click', async (e) => {
+                        const target = e.target;
+                        const isDeleteButton = target.closest('.delete-platform-btn');
+                        const isEditButton = target.closest('.edit-platform-btn');
+
+                        if (isDeleteButton) {
+                            const platformId = isDeleteButton.getAttribute('data-id');
+                            if (confirm('Tem certeza que deseja deletar esta plataforma?')) {
+                                try {
+                                    const docRef = doc(db, `users/${auth.currentUser.uid}/platforms`, platformId);
+                                    await deleteDoc(docRef);
+                                    alert('Plataforma deletada com sucesso!');
+                                    loadPlatforms();
+                                } catch (e) {
+                                    console.error("Erro ao remover documento: ", e);
+                                    alert('Erro ao deletar plataforma. Tente novamente.');
+                                }
+                            }
+                        }
+
+                        if (isEditButton) {
+                            const platformId = isEditButton.getAttribute('data-id');
+                            const platformDoc = people.find(p => p.id === currentPersonId)
+                                .platforms.find(pl => pl.id === platformId);
+                            
+                            document.getElementById('current-platform-balance').textContent = formatCurrency(platformDoc.balance);
+                            document.getElementById('platform-name-display').textContent = platformDoc.name;
+                            document.getElementById('current-platform-id').value = platformId;
+                            transactionFormContainer.style.display = 'block';
+                        }
+                    });
+                }
+            } else {
+                authContainer.style.display = 'block';
+                mainContent.style.display = 'none';
+                console.log("Nenhum usuário logado.");
+            }
+        });
+
+        registerButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Cadastro realizado com sucesso! Pode entrar.');
+                })
+                .catch((error) => {
+                    alert('Erro ao cadastrar: ' + error.message);
+                });
+        });
+
+        loginButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Login realizado com sucesso!');
+                })
+                .catch((error) => {
+                    alert('Erro ao fazer login: ' + error.message);
+                });
+        });
+    });
+
     let bets = [];
     let people = [];
     let unusedFreebets = [];
