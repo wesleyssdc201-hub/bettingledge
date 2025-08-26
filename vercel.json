@@ -1,13 +1,12 @@
 {
-  "build": {
-    "env": {
-      "NODE_VERSION": "18.x"
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  },
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "outputDirectory": "./"
+  ]
 }
