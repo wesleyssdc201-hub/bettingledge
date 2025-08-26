@@ -830,11 +830,12 @@
                 const personDoc = await getDoc(personRef);
                 if (personDoc.exists()) {
                     const personData = personDoc.data();
-                    personData.platforms.push({ id: Date.now().toString(), name: name });
+                    const newPlatformId = Date.now().toString(); // Cria um ID único
+                    personData.platforms.push({ id: newPlatformId, name: name });
                     await updateDoc(personRef, { platforms: personData.platforms });
                     alert('Plataforma adicionada com sucesso!');
                     addPlatformForm.reset();
-                    loadPeople();
+                    loadPeople(); // Atualiza a lista na tela
                 }
             } catch (e) {
                 console.error("Erro ao adicionar plataforma: ", e);
