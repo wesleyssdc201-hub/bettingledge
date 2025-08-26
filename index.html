@@ -13,22 +13,6 @@
             background-color: #0c0c0c;
             color: #E5E5E5;
         }
-        .tab-button {
-            border-bottom: 3px solid transparent;
-            transition: border-color 0.3s ease;
-        }
-        .tab-button.active {
-            border-bottom-color: #E5E5E5;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
         .lds-dual-ring {
             display: inline-block;
             width: 20px;
@@ -46,237 +30,336 @@
             animation: lds-dual-ring 1.2s linear infinite;
         }
         @keyframes lds-dual-ring {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .tab-button {
+            border-bottom: 3px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        .tab-button.active {
+            border-bottom-color: #E5E5E5;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
         }
     </style>
 </head>
 <body class="bg-zinc-950 text-neutral-200 p-4 min-h-screen flex flex-col items-center">
 
-    <div id="auth-container" class="bg-zinc-800 p-8 rounded-lg shadow-lg w-full max-w-sm mt-20">
-        <div id="login-form">
-            <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
-            <div class="space-y-4">
-                <input type="email" id="email-input" placeholder="Email" class="w-full p-3 bg-zinc-700 rounded-md border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="password" id="password-input" placeholder="Senha" class="w-full p-3 bg-zinc-700 rounded-md border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <div class="flex justify-between space-x-2 mt-4">
-                    <button id="login-button" class="flex-1 bg-indigo-600 text-white p-3 rounded-md font-semibold hover:bg-indigo-700 transition duration-300">Entrar</button>
-                    <button id="show-register-button" class="flex-1 bg-zinc-600 text-white p-3 rounded-md font-semibold hover:bg-zinc-700 transition duration-300">Cadastrar</button>
-                </div>
-            </div>
+    <div id="auth-container" class="container mx-auto p-8 bg-zinc-900 rounded-2xl shadow-lg w-full max-w-sm" style="display: none;">
+        <h1 class="text-3xl font-bold text-center mb-6 text-white">Login & Cadastro</h1>
+        <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-neutral-300">Email</label>
+            <input type="email" id="email" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
         </div>
-        
-        <div id="register-form" class="hidden">
-            <h2 class="text-2xl font-bold mb-6 text-center">Cadastro</h2>
-            <div class="space-y-4">
-                <input type="email" id="register-email-input" placeholder="Email" class="w-full p-3 bg-zinc-700 rounded-md border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="password" id="register-password-input" placeholder="Senha" class="w-full p-3 bg-zinc-700 rounded-md border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <div class="flex justify-between space-x-2 mt-4">
-                    <button id="register-button" class="flex-1 bg-indigo-600 text-white p-3 rounded-md font-semibold hover:bg-indigo-700 transition duration-300">Criar Conta</button>
-                    <button id="show-login-button" class="flex-1 bg-zinc-600 text-white p-3 rounded-md font-semibold hover:bg-zinc-700 transition duration-300">Voltar para Login</button>
-                </div>
-            </div>
+        <div class="mb-6">
+            <label for="password" class="block text-sm font-medium text-neutral-300">Senha</label>
+            <input type="password" id="password" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
         </div>
+        <div class="flex justify-between items-center">
+            <button id="login-btn" class="flex-1 mr-2 px-4 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">Entrar</button>
+            <button id="register-btn" class="flex-1 ml-2 px-4 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">Cadastrar</button>
+        </div>
+        <p class="text-sm text-red-400 text-center mt-4" id="auth-error-message"></p>
     </div>
 
-    <div id="main-content" class="w-full max-w-5xl mx-auto hidden">
-        <header class="flex justify-between items-center py-4 mb-4 border-b border-zinc-700">
-            <h1 class="text-3xl font-bold">Betting Ledger</h1>
-            <div class="flex items-center space-x-4">
-                <span id="user-display" class="text-sm text-neutral-400"></span>
-                <button id="logout-button" class="bg-zinc-700 text-white px-3 py-1 rounded-md text-sm hover:bg-zinc-600 transition duration-300">Sair</button>
-            </div>
-        </header>
-
-        <div class="flex space-x-4 mb-4">
-            <button id="bets-tab" class="tab-button active pb-2">Apostas</button>
-            <button id="people-tab" class="tab-button pb-2">Pessoas & Plataformas</button>
-            <button id="dashboard-tab" class="tab-button pb-2">Dashboard</button>
+    <div id="main-content" class="container mx-auto p-6 bg-zinc-900 rounded-2xl shadow-lg w-full max-w-4xl" style="display: none;">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-white">Gerenciador de Bankroll</h1>
+            <button id="logout-btn" class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition duration-300">Sair</button>
         </div>
 
-        <div id="bets-content" class="tab-content active space-y-8">
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold mb-4">Adicionar Nova Aposta</h3>
-                <form id="addBetForm" class="space-y-4">
+        <nav class="flex justify-center border-b border-zinc-700 mb-8">
+            <button id="btn-tab-gerenciador" class="tab-button active px-4 py-2 text-white font-semibold transition-colors duration-200">
+                Apostas
+            </button>
+            <button id="btn-tab-historico" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+                Histórico
+            </button>
+            <button id="btn-tab-freebets" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+                Freebets
+            </button>
+            <button id="btn-tab-pessoas" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+                Pessoas & Plataformas
+            </button>
+            <button id="btn-tab-ganhos" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+                Levantamento de Ganhos
+            </button>
+        </nav>
+
+        <div id="tab-gerenciador" class="tab-content active">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">Bankroll Atual</p>
+                    <p id="current-bankroll" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
+                </div>
+                <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">Lucro/Prejuízo</p>
+                    <p id="profit-loss" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
+                </div>
+                <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">Total de Apostas</p>
+                    <p id="total-bets" class="text-xl font-bold mt-1 text-white">0</p>
+                </div>
+                <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">ROI (%)</p>
+                    <p id="roi" class="text-xl font-bold mt-1 text-white">0.00%</p>
+                </div>
+            </div>
+
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+                <h2 class="text-xl font-bold mb-4 text-white" id="bet-form-title">Adicionar Nova Aposta</h2>
+                <form id="bet-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label for="date" class="block text-sm font-medium text-neutral-400">Data</label>
-                        <input type="date" id="date" name="date" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
+                        <label for="date" class="block text-sm font-medium text-neutral-300">Data</label>
+                        <input type="date" id="date" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
                     </div>
                     <div>
-                        <label for="description" class="block text-sm font-medium text-neutral-400">Descrição</label>
-                        <input type="text" id="description" name="description" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
+                        <label for="description" class="block text-sm font-medium text-neutral-300">Evento / Descrição</label>
+                        <input type="text" id="description" placeholder="Ex: Jogo de futebol" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
                     </div>
                     <div>
-                        <label for="bet-person-id" class="block text-sm font-medium text-neutral-400">Pessoa</label>
-                        <select id="bet-person-id" name="person" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                            <option value="">Selecione uma pessoa</option>
+                        <label for="person" class="block text-sm font-medium text-neutral-300">Pessoa</label>
+                        <select id="person" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                            <option value="">Selecione a Pessoa</option>
                         </select>
                     </div>
                     <div>
-                        <label for="bet-platform-id" class="block text-sm font-medium text-neutral-400">Plataforma</label>
-                        <select id="bet-platform-id" name="platform" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                            <option value="">Selecione uma plataforma</option>
+                        <label for="platform" class="block text-sm font-medium text-neutral-300">Plataforma</label>
+                        <select id="platform" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
+                            <option value="">Selecione a Plataforma</option>
                         </select>
                     </div>
                     <div>
-                        <label for="type" class="block text-sm font-medium text-neutral-400">Tipo</label>
-                        <input type="text" id="type" name="type" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                    </div>
-                    <div>
-                        <label for="stake" class="block text-sm font-medium text-neutral-400">Stake</label>
-                        <input type="number" id="stake" name="stake" required step="0.01" class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                    </div>
-                    <div>
-                        <label for="odds" class="block text-sm font-medium text-neutral-400">Odds</label>
-                        <input type="number" id="odds" name="odds" required step="0.01" class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                    </div>
-                    <div>
-                        <label for="result" class="block text-sm font-medium text-neutral-400">Resultado</label>
-                        <select id="result" name="result" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                            <option value="Green">Green</option>
-                            <option value="Half Green">Half Green</option>
-                            <option value="Red">Red</option>
-                            <option value="Half Red">Half Red</option>
-                            <option value="Void">Void</option>
+                        <label for="type" class="block text-sm font-medium text-neutral-300">Tipo</label>
+                        <select id="type" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50">
+                            <option value="Normal">Normal</option>
+                            <option value="Missao">Missão</option>
+                            <option value="Bonus">Bônus</option>
+                            <option value="Freebet">Freebet</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
-                        Adicionar Aposta
-                    </button>
+                    <div>
+                        <label for="stake" class="block text-sm font-medium text-neutral-300">Valor Apostado (R$)</label>
+                        <input type="number" step="0.001" id="stake" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="odds" class="block text-sm font-medium text-neutral-300">Odds</label>
+                        <input type="number" step="0.001" id="odds" placeholder="Ex: 2.50" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity50" required>
+                    </div>
+                    <div>
+                        <label for="result" class="block text-sm font-medium text-neutral-300">Resultado</label>
+                        <select id="result" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50">
+                            <option value="">Selecione</option>
+                            <option value="Green">Green (Ganhou)</option>
+                            <option value="Half Green">Meio Green</option>
+                            <option value="Red">Red (Perdeu)</option>
+                            <option value="Half Red">Meio Red</option>
+                            <option value="Void">Void (Anulada)</option>
+                            <option value="Aberta">Aberta (Não finalizada)</option>
+                            <option value="Aberta FB">Aberta FB (não finalizado)</option>
+                            <option value="Red FB">Red FB (Perdeu)</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
+                        <button type="submit" id="bet-form-button" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
+                            Adicionar Aposta
+                        </button>
+                    </div>
                 </form>
             </div>
-            
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold mb-4">Apostas Recentes</h3>
-                <div class="overflow-x-auto">
+
+            <div id="message-box" class="hidden p-4 rounded-md mb-4 text-center text-sm"></div>
+
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-white">Apostas Abertas</h2>
+                    <button id="clear-bet-data-btn" class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition duration-300">
+                        Limpar Todos os Dados
+                    </button>
+                </div>
+                <table class="min-w-full divide-y divide-zinc-700">
+                    <thead class="bg-zinc-900">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Data</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Descrição</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Tipo</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor Apostado</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Odds</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Resultado</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Retorno</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Lucro</th>
+                            <th class="px-4 py-2 whitespace-nowrap text-sm font-medium text-neutral-400 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bets-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-historico" class="tab-content">
+             <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-white">Histórico de Apostas Finalizadas</h2>
+                </div>
+                <table class="min-w-full divide-y divide-zinc-700">
+                    <thead class="bg-zinc-900">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Data</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Descrição</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Tipo</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor Apostado</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Odds</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Resultado</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Retorno</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Lucro</th>
+                            <th class="px-4 py-2 whitespace-nowrap text-sm font-medium text-neutral-400 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-freebets" class="tab-content">
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+                <h2 class="text-xl font-bold mb-4 text-white">Adicionar Freebet</h2>
+                <form id="freebet-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="freebet-person" class="block text-sm font-medium text-neutral-300">Pessoa</label>
+                        <select id="freebet-person" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                            <option value="">Selecione a Pessoa</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="freebet-platform" class="block text-sm font-medium text-neutral-300">Plataforma</label>
+                        <select id="freebet-platform" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
+                            <option value="">Selecione a Plataforma</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="freebet-stake" class="block text-sm font-medium text-neutral-300">Valor (R$)</label>
+                        <input type="number" step="0.01" id="freebet-stake" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="freebet-quantity" class="block text-sm font-medium text-neutral-300">Quantidade</label>
+                        <input type="number" id="freebet-quantity" value="1" min="1" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="freebet-received" class="block text-sm font-medium text-neutral-300">Recebida?</label>
+                        <select id="freebet-received" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50">
+                            <option value="true">Sim</option>
+                            <option value="false">Não</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">Adicionar Freebet</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+                <h2 class="text-xl font-bold mb-4 text-white">Freebets Disponíveis</h2>
+                <table class="min-w-full divide-y divide-zinc-700">
+                    <thead class="bg-zinc-900">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Quantidade</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Total</th>
+                            <th class="px-4 py-2 whitespace-nowrap text-sm font-medium text-neutral-400 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="freebets-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-pessoas" class="tab-content">
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+                <h2 class="text-xl font-bold mb-4 text-white">Adicionar Pessoa</h2>
+                <form id="add-person-form" class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" id="person-name" placeholder="Nome da Pessoa" class="flex-1 mt-1 rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">Adicionar Pessoa</button>
+                </form>
+            </div>
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+                <h2 class="text-xl font-bold mb-4 text-white">Pessoas & Plataformas</h2>
+                <div id="people-list"></div>
+            </div>
+        </div>
+
+        <div id="tab-ganhos" class="tab-content">
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner">
+                <h2 class="text-xl font-bold mb-4 text-white">Levantamento de Ganhos</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="person-gains" class="block text-sm font-medium text-neutral-300">Pessoa</label>
+                        <select id="person-gains" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                            <option value="">Selecione a Pessoa</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="platform-gains" class="block text-sm font-medium text-neutral-300">Plataforma</label>
+                        <select id="platform-gains" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
+                            <option value="">Selecione a Plataforma</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label for="amount-gains" class="block text-sm font-medium text-neutral-300">Valor Retirado (R$)</label>
+                    <input type="number" step="0.01" id="amount-gains" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div class="flex justify-center mt-6">
+                    <button id="add-gains-btn" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
+                        Adicionar Retirada
+                    </button>
+                </div>
+                <div class="mt-8 overflow-x-auto">
+                    <h3 class="text-lg font-semibold mb-2 text-white">Histórico de Levantamentos</h3>
                     <table class="min-w-full divide-y divide-zinc-700">
-                        <thead class="bg-zinc-700">
+                        <thead class="bg-zinc-900">
                             <tr>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Data</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Descrição</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Pessoa</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Plataforma</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Tipo</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Stake</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Odds</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Resultado</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Retorno</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Lucro</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Ações</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Data</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor Retirado</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="bets-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
-                            </tbody>
+                        <tbody id="gains-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div id="people-content" class="tab-content space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-zinc-800 p-4 rounded-lg shadow-lg">
-                    <h3 class="text-lg font-semibold mb-4">Adicionar Nova Pessoa</h3>
-                    <form id="addPersonForm" class="space-y-4">
-                        <div>
-                            <label for="person-name-input" class="block text-sm font-medium text-neutral-400">Nome</label>
-                            <input type="text" id="person-name-input" name="name" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
-                            Adicionar Pessoa
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="bg-zinc-800 p-4 rounded-lg shadow-lg">
-                    <h3 class="text-lg font-semibold mb-4">Adicionar Nova Plataforma</h3>
-                    <form id="addPlatformForm" class="space-y-4">
-                        <div>
-                            <label for="platform-person-id" class="block text-sm font-medium text-neutral-400">Pessoa</label>
-                            <select id="platform-person-id" name="person" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                                <option value="">Selecione uma pessoa</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="platform-name" class="block text-sm font-medium text-neutral-400">Nome da Plataforma</label>
-                            <input type="text" id="platform-name" name="name" required class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
-                            Adicionar Plataforma
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="col-span-1 md:col-span-2 bg-zinc-800 p-4 rounded-lg shadow-lg">
-                    <h3 class="text-lg font-semibold mb-4">Gerenciar Depósitos e Saques</h3>
-                    <form id="addTransactionForm" class="space-y-4">
-                        <div>
-                            <label for="transaction-person-id" class="block text-sm font-medium text-neutral-400">Pessoa</label>
-                            <select id="transaction-person-id" name="person" required
-                                class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                                <option value="">Selecione uma pessoa</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="transaction-platform-id" class="block text-sm font-medium text-neutral-400">Plataforma</label>
-                            <select id="transaction-platform-id" name="platform" required
-                                class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                                <option value="">Selecione uma plataforma</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="transaction-type" class="block text-sm font-medium text-neutral-400">Tipo</label>
-                            <select id="transaction-type" name="type" required
-                                class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                                <option value="Deposit">Depósito</option>
-                                <option value="Withdrawal">Saque</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="transaction-amount" class="block text-sm font-medium text-neutral-400">Valor</label>
-                            <input type="number" id="transaction-amount" name="amount" required step="0.01"
-                                class="mt-1 block w-full bg-zinc-700 border border-zinc-600 rounded-md shadow-sm text-neutral-200">
-                        </div>
-                        <button type="submit"
-                            class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
-                            Adicionar Transação
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <button onclick="importDataToFirebase()" class="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors mt-4">
-                Importar Dados do Backup
-            </button>
-
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-lg mt-8">
-                <h3 class="text-lg font-semibold mb-4">Pessoas & Plataformas</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-zinc-700">
-                        <thead class="bg-zinc-700">
-                            <tr>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Pessoa</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Plataforma</th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="people-platforms-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="dashboard-content" class="tab-content space-y-8">
-            <h3 class="text-lg font-semibold mb-4">Dashboard (em desenvolvimento)</h3>
-        </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, query, where, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <script>
-        // Seus dados de configuração do Firebase
+        // Cole a configuração do seu Firebase aqui
         const firebaseConfig = {
             apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
             authDomain: "betting-ledger-558f2.firebaseapp.com",
@@ -285,239 +368,346 @@
             messagingSenderId: "68773956884",
             appId: "1:68773956884:web:1bd90aba9cefede5c88601"
         };
-        
-        // Inicializar Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = app.auth();
-        const db = app.firestore();
-        const { getDoc, doc, collection, addDoc, getDocs, updateDoc, deleteDoc, query, where, serverTimestamp } = firebase.firestore;
-        
-        // Elementos HTML
-        const $ = id => document.getElementById(id);
-        const authContainer = $('auth-container');
-        const mainContent = $('main-content');
-        
-        // Auth Forms
-        const loginForm = $('login-form');
-        const registerForm = $('register-form');
-        const showRegisterButton = $('show-register-button');
-        const showLoginButton = $('show-login-button');
-        const loginButton = $('login-button');
-        const registerButton = $('register-button');
-        const emailInput = $('email-input');
-        const passwordInput = $('password-input');
-        const registerEmailInput = $('register-email-input');
-        const registerPasswordInput = $('register-password-input');
-        
-        // Main Content
-        const logoutButton = $('logout-button');
-        const userDisplay = $('user-display');
-        const betsTableBody = $('bets-table-body');
-        const peoplePlatformsTableBody = $('people-platforms-table-body');
+        // Fim da configuração
 
-        // Formulários
-        const addBetForm = $('addBetForm');
-        const addPersonForm = $('addPersonForm');
-        const addPlatformForm = $('addPlatformForm');
-        const addTransactionForm = $('addTransactionForm');
-        const betsTab = $('bets-tab');
-        const peopleTab = $('people-tab');
-        const dashboardTab = $('dashboard-tab');
-        const tabs = [betsTab, peopleTab, dashboardTab];
-        const tabContents = [$('bets-content'), $('people-content'), $('dashboard-content')];
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Variáveis globais
-        let people = [];
+        const authContainer = document.getElementById('auth-container');
+        const mainContent = document.getElementById('main-content');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('login-btn');
+        const registerButton = document.getElementById('register-btn');
+        const logoutButton = document.getElementById('logout-btn');
+        const authErrorMessage = document.getElementById('auth-error-message');
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        const addBetForm = document.getElementById('bet-form');
+        const betsTableBody = document.getElementById('bets-table-body');
+        const historyTableBody = document.getElementById('history-table-body');
+        const clearBetDataBtn = document.getElementById('clear-bet-data-btn');
+
+        const currentBankrollDisplay = document.getElementById('current-bankroll');
+        const profitLossDisplay = document.getElementById('profit-loss');
+        const totalBetsDisplay = document.getElementById('total-bets');
+        const roiDisplay = document.getElementById('roi');
+
+        const personSelect = document.getElementById('person');
+        const platformSelect = document.getElementById('platform');
+        const freebetPersonSelect = document.getElementById('freebet-person');
+        const freebetPlatformSelect = document.getElementById('freebet-platform');
+        const gainsPersonSelect = document.getElementById('person-gains');
+        const gainsPlatformSelect = document.getElementById('platform-gains');
+
+        const addPersonForm = document.getElementById('add-person-form');
+        const addPersonInput = document.getElementById('person-name');
+        const peopleList = document.getElementById('people-list');
+
+        const addFreebetForm = document.getElementById('freebet-form');
+        const freebetsTableBody = document.getElementById('freebets-table-body');
+
+        const gainsTableBody = document.getElementById('gains-table-body');
+        const addGainsBtn = document.getElementById('add-gains-btn');
+        const gainsAmountInput = document.getElementById('amount-gains');
+
         let bets = [];
+        let people = [];
         let freebets = [];
-        let transactions = [];
-        let isDataLoaded = false;
+        let gains = [];
 
-        // Funções de UI
-        const showTab = (tabId) => {
-            tabs.forEach(tab => {
-                if (tab.id === tabId) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-            tabContents.forEach(content => {
-                if (content.id === `${tabId.replace('-tab', '')}-content`) {
-                    content.classList.add('active');
-                } else {
-                    content.classList.remove('active');
-                }
-            });
-        };
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => showTab(tab.id));
-        });
-        showTab('bets-tab');
+        async function loadData() {
+            if (!auth.currentUser) return;
 
-        // Funções de Utilitário
-        const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
-        };
+            const userId = auth.currentUser.uid;
+            
+            // Carregar Apostas
+            const betsCollection = collection(db, `users/${userId}/bets`);
+            const betsSnapshot = await getDocs(betsCollection);
+            bets = betsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Carregar dados
-        const loadPeople = async () => {
-            const peopleRef = collection(db, `users/${auth.currentUser.uid}/people`);
-            const peopleSnap = await getDocs(peopleRef);
-            people = peopleSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            const betPersonSelect = $('bet-person-id');
-            const platformPersonSelect = $('platform-person-id');
-            const transactionPersonSelect = $('transaction-person-id');
-            const transactionPlatformSelect = $('transaction-platform-id');
-
-            [betPersonSelect, platformPersonSelect, transactionPersonSelect].forEach(select => {
-                select.innerHTML = '<option value="">Selecione uma pessoa</option>';
+            // Carregar Pessoas e Plataformas
+            const peopleCollection = collection(db, `users/${userId}/people`);
+            const peopleSnapshot = await getDocs(peopleCollection);
+            people = peopleSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    name: data.name,
+                    platforms: data.platforms || []
+                };
             });
             
-            people.forEach(p => {
-                const option = document.createElement('option');
-                option.value = p.id;
-                option.textContent = p.name;
-                [betPersonSelect, platformPersonSelect, transactionPersonSelect].forEach(select => select.appendChild(option.cloneNode(true)));
-            });
+            // Carregar Freebets
+            const freebetsCollection = collection(db, `users/${userId}/freebets`);
+            const freebetsSnapshot = await getDocs(freebetsCollection);
+            freebets = freebetsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            platformPersonSelect.addEventListener('change', () => {
-                const selectedPerson = people.find(p => p.id === platformPersonSelect.value);
-                transactionPlatformSelect.innerHTML = '<option value="">Selecione uma plataforma</option>';
-                if (selectedPerson) {
-                    selectedPerson.platforms.forEach(plat => {
-                        const option = document.createElement('option');
-                        option.value = plat.id;
-                        option.textContent = plat.name;
-                        transactionPlatformSelect.appendChild(option);
-                    });
-                }
-            });
-            renderPeoplePlatforms();
-        };
-
-        const loadBets = async () => {
-            const betsRef = collection(db, `users/${auth.currentUser.uid}/bets`);
-            const betsSnap = await getDocs(betsRef);
-            bets = betsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderBets(bets);
-        };
-        const loadTransactions = async () => {
-            const transactionsRef = collection(db, `users/${auth.currentUser.uid}/transactions`);
-            const transactionsSnap = await getDocs(transactionsRef);
-            transactions = transactionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        };
-        const loadFreebets = async () => { /* Implementar */ };
-        const loadWithdrawals = async () => { /* Implementar */ };
-
-        const updateAll = async () => {
-            await loadPeople();
-            await loadBets();
-            await loadTransactions();
-            loadFreebets();
-            loadWithdrawals();
-
-            const platformBalances = {};
+            // Carregar Levantamentos
+            const gainsCollection = collection(db, `users/${userId}/gains`);
+            const gainsSnapshot = await getDocs(gainsCollection);
+            gains = gainsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            bets.forEach(bet => {
-                if (!platformBalances[bet.platformId]) {
-                    platformBalances[bet.platformId] = {
-                        name: bet.platformName,
-                        balance: 0
-                    };
-                }
-                platformBalances[bet.platformId].balance += bet.profit;
-            });
+            updateAll();
+        }
 
-            transactions.forEach(t => {
-                if (platformBalances[t.platformId]) {
-                    if (t.type === 'Deposit') {
-                        platformBalances[t.platformId].balance += t.amount;
-                    } else if (t.type === 'Withdrawal') {
-                        platformBalances[t.platformId].balance -= t.amount;
-                    }
-                }
-            });
-        };
+        async function updateAll() {
+            await loadData();
+            renderBets();
+            renderHistory();
+            updateBankrollDisplay();
+            renderPeople();
+            renderFreebets();
+            renderGains();
+        }
 
-        // Renderizar tabelas
-        const renderBets = (betsToRender) => {
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        function updateBankrollDisplay() {
+            const openBets = bets.filter(bet => bet.result === 'Aberta' || bet.result === 'Aberta FB');
+            const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB');
+
+            const totalStakedOpen = openBets.reduce((sum, bet) => sum + parseFloat(bet.stake), 0);
+            const totalProfit = finishedBets.reduce((sum, bet) => sum + parseFloat(bet.profit), 0);
+            const totalGains = gains.reduce((sum, gain) => sum + parseFloat(gain.amount), 0);
+            const totalStakedFinished = finishedBets.reduce((sum, bet) => sum + parseFloat(bet.stake), 0);
+
+            const currentBankroll = totalStakedOpen + totalProfit - totalGains;
+            const roi = totalStakedFinished > 0 ? (totalProfit / totalStakedFinished) * 100 : 0;
+
+            currentBankrollDisplay.textContent = formatCurrency(currentBankroll);
+            profitLossDisplay.textContent = formatCurrency(totalProfit);
+            profitLossDisplay.style.color = totalProfit >= 0 ? '#34d399' : '#f87171';
+            totalBetsDisplay.textContent = finishedBets.length;
+            roiDisplay.textContent = `${roi.toFixed(2)}%`;
+            roiDisplay.style.color = roi >= 0 ? '#34d399' : '#f87171';
+        }
+
+        function renderBets() {
+            const openBets = bets.filter(bet => bet.result === 'Aberta' || bet.result === 'Aberta FB');
             betsTableBody.innerHTML = '';
-            betsToRender.forEach(bet => {
-                const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
-                const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
+            openBets.forEach(bet => {
                 const row = document.createElement('tr');
-                row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
                 row.innerHTML = `
-                    <td class="px-4 py-2 text-sm text-neutral-400">${new Date(bet.date).toLocaleDateString()}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${bet.description}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${bet.personName}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${bet.platformName}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${bet.type}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.stake)}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${bet.odds}</td>
-                    <td class="px-4 py-2 text-sm font-semibold ${resultColorClass}">${bet.result}</td>
-                    <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.return)}</td>
-                    <td class="px-4 py-2 text-sm font-semibold ${profitColorClass}">${formatCurrency(bet.profit)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-xs text-neutral-300">${bet.date}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.description}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.personName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.platformName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.type}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(bet.stake)}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.odds.toFixed(2)}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.result}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(bet.return)}</td>
+                    <td class="px-4 py-2 text-sm ${bet.profit >= 0 ? 'text-green-400' : 'text-red-400'}">${formatCurrency(bet.profit)}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                        <button class="delete-bet-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-700 transition duration-300" data-id="${bet.id}">
-                            <i class="fas fa-trash-alt"></i> Excluir
+                        <button class="text-indigo-400 hover:text-indigo-600 edit-bet-btn" data-id="${bet.id}">
+                            <i class="fas fa-edit"></i>
                         </button>
                     </td>
                 `;
                 betsTableBody.appendChild(row);
             });
-            document.querySelectorAll('.delete-bet-btn').forEach(button => {
-                button.addEventListener('click', (e) => deleteBet(e.target.closest('button').dataset.id));
-            });
-        };
+        }
 
-        const renderPeoplePlatforms = () => {
-            peoplePlatformsTableBody.innerHTML = '';
-            people.forEach(person => {
-                if (person.platforms && person.platforms.length > 0) {
-                    person.platforms.forEach(platform => {
-                        const row = document.createElement('tr');
-                        row.className = 'bg-zinc-700';
-                        row.innerHTML = `
-                            <td class="px-4 py-2 font-bold">${person.name}</td>
-                            <td class="px-4 py-2 text-sm text-neutral-400">${platform.name}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                                <button class="delete-platform-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-700 transition duration-300" data-person-id="${person.id}" data-platform-id="${platform.id}">
-                                    <i class="fas fa-trash-alt"></i> Excluir Plataforma
-                                </button>
-                            </td>
-                        `;
-                        peoplePlatformsTableBody.appendChild(row);
-                    });
-                }
+        function renderHistory() {
+            const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB');
+            historyTableBody.innerHTML = '';
+            finishedBets.forEach(bet => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap text-xs text-neutral-300">${bet.date}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.description}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.personName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.platformName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.type}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(bet.stake)}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.odds.toFixed(2)}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${bet.result}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(bet.return)}</td>
+                    <td class="px-4 py-2 text-sm ${bet.profit >= 0 ? 'text-green-400' : 'text-red-400'}">${formatCurrency(bet.profit)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                        <button class="text-red-400 hover:text-red-600 delete-bet-btn" data-id="${bet.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                historyTableBody.appendChild(row);
             });
-            document.querySelectorAll('.delete-platform-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const personId = e.target.closest('button').dataset.personId;
-                    const platformId = e.target.closest('button').dataset.platformId;
-                    deletePlatform(personId, platformId);
+        }
+
+        function renderPeople() {
+            personSelect.innerHTML = '<option value="">Selecione a Pessoa</option>';
+            freebetPersonSelect.innerHTML = '<option value="">Selecione a Pessoa</option>';
+            gainsPersonSelect.innerHTML = '<option value="">Selecione a Pessoa</option>';
+            peopleList.innerHTML = '';
+
+            people.forEach(person => {
+                // Preencher selects
+                const option = document.createElement('option');
+                option.value = person.id;
+                option.textContent = person.name;
+                personSelect.appendChild(option.cloneNode(true));
+                freebetPersonSelect.appendChild(option.cloneNode(true));
+                gainsPersonSelect.appendChild(option.cloneNode(true));
+
+                // Renderizar lista de pessoas e plataformas
+                const personDiv = document.createElement('div');
+                personDiv.className = 'bg-zinc-900 p-4 rounded-xl mb-4 shadow-inner';
+                personDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-white">${person.name}</h3>
+                        <button class="text-red-400 hover:text-red-600 delete-person-btn" data-id="${person.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    <form id="add-platform-form-${person.id}" class="flex flex-col sm:flex-row gap-2 mb-4">
+                        <input type="text" placeholder="Nome da Plataforma" class="flex-1 rounded-md border-zinc-700 bg-zinc-950 text-neutral-200 p-2 shadow-sm" required>
+                        <button type="submit" class="w-full sm:w-auto px-4 py-1 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition duration-300">Adicionar Plataforma</button>
+                    </form>
+                    <ul class="list-disc pl-5 text-neutral-300">
+                        ${person.platforms.map(platform => `
+                            <li class="flex justify-between items-center text-sm py-1">
+                                <span>${platform.name}</span>
+                                <button class="text-red-400 hover:text-red-600 delete-platform-btn" data-person-id="${person.id}" data-platform-id="${platform.id}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                peopleList.appendChild(personDiv);
+
+                // Adicionar evento para cada formulário de plataforma
+                const addPlatformForm = document.getElementById(`add-platform-form-${person.id}`);
+                addPlatformForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const platformName = addPlatformForm.querySelector('input').value;
+                    if (platformName) {
+                        const personRef = doc(db, `users/${auth.currentUser.uid}/people`, person.id);
+                        const newPlatform = { id: Date.now().toString(), name: platformName };
+                        await updateDoc(personRef, {
+                            platforms: [...person.platforms, newPlatform]
+                        });
+                        addPlatformForm.reset();
+                        updateAll();
+                    }
                 });
             });
-        };
-        
-        // Funções de Gerenciamento de Dados (Adicionar/Deletar)
-        
-        // Adicionar Aposta
+
+            // Adicionar eventos de exclusão de plataforma
+            document.querySelectorAll('.delete-platform-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const personId = button.dataset.personId;
+                    const platformId = button.dataset.platformId;
+                    const personRef = doc(db, `users/${auth.currentUser.uid}/people`, personId);
+                    const updatedPlatforms = people.find(p => p.id === personId).platforms.filter(p => p.id !== platformId);
+                    await updateDoc(personRef, { platforms: updatedPlatforms });
+                    updateAll();
+                });
+            });
+
+            // Adicionar eventos de exclusão de pessoa
+            document.querySelectorAll('.delete-person-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const personId = button.dataset.id;
+                    if (confirm("Tem certeza que deseja deletar esta pessoa e todas as suas plataformas?")) {
+                        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/people`, personId));
+                        updateAll();
+                    }
+                });
+            });
+        }
+
+        function renderFreebets() {
+            freebetsTableBody.innerHTML = '';
+            freebets.forEach(fb => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 text-sm text-neutral-300">${fb.personName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${fb.platformName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(fb.stake)}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${fb.quantity}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(fb.stake * fb.quantity)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                        <button class="text-red-400 hover:text-red-600 delete-freebet-btn" data-id="${fb.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                freebetsTableBody.appendChild(row);
+            });
+            // Adicionar eventos de exclusão de freebet
+            document.querySelectorAll('.delete-freebet-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const freebetId = button.dataset.id;
+                    if (confirm("Tem certeza que deseja deletar esta freebet?")) {
+                        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/freebets`, freebetId));
+                        updateAll();
+                    }
+                });
+            });
+        }
+
+        function renderGains() {
+            gainsTableBody.innerHTML = '';
+            gains.forEach(gain => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap text-xs text-neutral-300">${gain.date}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${gain.personName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${gain.platformName}</td>
+                    <td class="px-4 py-2 text-sm text-neutral-300">${formatCurrency(gain.amount)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                        <button class="text-red-400 hover:text-red-600 delete-gain-btn" data-id="${gain.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                gainsTableBody.appendChild(row);
+            });
+            // Adicionar eventos de exclusão de levantamento
+            document.querySelectorAll('.delete-gain-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const gainId = button.dataset.id;
+                    if (confirm("Tem certeza que deseja deletar este levantamento?")) {
+                        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/gains`, gainId));
+                        updateAll();
+                    }
+                });
+            });
+        }
+
+        // Event Listeners
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(button.id.replace('btn-', '')).classList.add('active');
+            });
+        });
+
         addBetForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const date = $('date').value;
-            const description = $('description').value;
-            const personId = $('bet-person-id').value;
-            const platformId = $('bet-platform-id').value;
-            const type = $('type').value;
-            const stake = parseFloat($('stake').value);
-            const odds = parseFloat($('odds').value);
-            const result = $('result').value;
-
+            const date = document.getElementById('date').value;
+            const description = document.getElementById('description').value;
+            const personId = document.getElementById('person').value;
+            const platformId = document.getElementById('platform').value;
+            const type = document.getElementById('type').value;
+            const stake = parseFloat(document.getElementById('stake').value);
+            const odds = parseFloat(document.getElementById('odds').value);
+            const result = document.getElementById('result').value;
             let profit = 0;
             let retorno = 0;
+
             if (result === 'Green') {
                 retorno = stake * odds;
                 profit = retorno - stake;
@@ -531,6 +721,12 @@
             } else if (result === 'Void') {
                 profit = 0;
                 retorno = stake;
+            } else if (result === 'Red FB') {
+                profit = 0;
+                retorno = 0;
+            } else if (result === 'Aberta FB') {
+                retorno = 0;
+                profit = -stake;
             }
 
             const person = people.find(p => p.id === personId);
@@ -555,223 +751,281 @@
                 addBetForm.reset();
                 updateAll();
             } catch (e) {
-                console.error("Erro ao adicionar aposta: ", e);
+                console.error("Erro ao adicionar documento: ", e);
                 alert('Erro ao adicionar aposta. Tente novamente.');
             }
         });
 
-        // Deletar Aposta
-        const deleteBet = async (id) => {
-            if (confirm('Tem certeza que deseja excluir esta aposta?')) {
-                try {
-                    await deleteDoc(doc(db, `users/${auth.currentUser.uid}/bets`, id));
-                    alert('Aposta excluída com sucesso!');
-                    updateAll();
-                } catch (e) {
-                    console.error("Erro ao excluir aposta: ", e);
-                    alert('Erro ao excluir aposta. Tente novamente.');
+        document.addEventListener('click', async (e) => {
+            if (e.target.matches('.delete-bet-btn, .delete-bet-btn *')) {
+                const button = e.target.closest('.delete-bet-btn');
+                const betId = button.dataset.id;
+                if (confirm("Tem certeza que deseja deletar esta aposta?")) {
+                    try {
+                        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/bets`, betId));
+                        alert('Aposta deletada com sucesso!');
+                        updateAll();
+                    } catch (e) {
+                        console.error('Erro ao deletar aposta:', e);
+                        alert('Erro ao deletar aposta. Tente novamente.');
+                    }
+                }
+            } else if (e.target.matches('.edit-bet-btn, .edit-bet-btn *')) {
+                const button = e.target.closest('.edit-bet-btn');
+                const betId = button.dataset.id;
+                const bet = bets.find(b => b.id === betId);
+                if (bet) {
+                    document.getElementById('bet-form-title').textContent = 'Editar Aposta';
+                    document.getElementById('bet-form-button').textContent = 'Salvar Edição';
+                    document.getElementById('date').value = bet.date;
+                    document.getElementById('description').value = bet.description;
+                    document.getElementById('person').value = bet.personId;
+                    
+                    const person = people.find(p => p.id === bet.personId);
+                    if (person) {
+                        platformSelect.disabled = false;
+                        platformSelect.innerHTML = person.platforms.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                        document.getElementById('platform').value = bet.platformId;
+                    }
+
+                    document.getElementById('type').value = bet.type;
+                    document.getElementById('stake').value = bet.stake;
+                    document.getElementById('odds').value = bet.odds;
+                    document.getElementById('result').value = bet.result;
+
+                    addBetForm.onsubmit = async (e) => {
+                        e.preventDefault();
+                        const updatedBet = {
+                            date: document.getElementById('date').value,
+                            description: document.getElementById('description').value,
+                            personId: document.getElementById('person').value,
+                            platformId: document.getElementById('platform').value,
+                            type: document.getElementById('type').value,
+                            stake: parseFloat(document.getElementById('stake').value),
+                            odds: parseFloat(document.getElementById('odds').value),
+                            result: document.getElementById('result').value
+                        };
+                        const updatedPerson = people.find(p => p.id === updatedBet.personId);
+                        const updatedPlatform = updatedPerson.platforms.find(p => p.id === updatedBet.platformId);
+                        updatedBet.personName = updatedPerson.name;
+                        updatedBet.platformName = updatedPlatform.name;
+
+                        if (updatedBet.result === 'Green') {
+                            updatedBet.return = updatedBet.stake * updatedBet.odds;
+                            updatedBet.profit = updatedBet.return - updatedBet.stake;
+                        } else if (updatedBet.result === 'Half Green') {
+                            updatedBet.return = (updatedBet.stake * updatedBet.odds) / 2 + updatedBet.stake / 2;
+                            updatedBet.profit = updatedBet.return - updatedBet.stake;
+                        } else if (updatedBet.result === 'Red') {
+                            updatedBet.profit = -updatedBet.stake;
+                            updatedBet.return = 0;
+                        } else if (updatedBet.result === 'Half Red') {
+                            updatedBet.profit = -updatedBet.stake / 2;
+                            updatedBet.return = updatedBet.stake / 2;
+                        } else if (updatedBet.result === 'Void') {
+                            updatedBet.profit = 0;
+                            updatedBet.return = updatedBet.stake;
+                        } else if (updatedBet.result === 'Red FB') {
+                            updatedBet.profit = 0;
+                            updatedBet.return = 0;
+                        } else if (updatedBet.result === 'Aberta FB') {
+                            updatedBet.return = 0;
+                            updatedBet.profit = -updatedBet.stake;
+                        } else { // Aberta
+                            updatedBet.return = 0;
+                            updatedBet.profit = 0;
+                        }
+
+                        try {
+                            await updateDoc(doc(db, `users/${auth.currentUser.uid}/bets`, betId), updatedBet);
+                            alert('Aposta atualizada com sucesso!');
+                            addBetForm.reset();
+                            document.getElementById('bet-form-title').textContent = 'Adicionar Nova Aposta';
+                            document.getElementById('bet-form-button').textContent = 'Adicionar Aposta';
+                            addBetForm.onsubmit = addBetFormOriginalSubmit; // Restaurar a função original
+                            updateAll();
+                        } catch (e) {
+                            console.error("Erro ao atualizar aposta: ", e);
+                            alert('Erro ao atualizar aposta. Tente novamente.');
+                        }
+                    };
                 }
             }
-        };
+        });
 
-        // Adicionar Pessoa
+        // Salvar a função de submit original para restaurar depois
+        const addBetFormOriginalSubmit = addBetForm.onsubmit;
+
+        personSelect.addEventListener('change', () => {
+            const personId = personSelect.value;
+            const selectedPerson = people.find(p => p.id === personId);
+            platformSelect.disabled = !selectedPerson;
+            platformSelect.innerHTML = selectedPerson ? selectedPerson.platforms.map(p => `<option value="${p.id}">${p.name}</option>`).join('') : '<option value="">Selecione a Plataforma</option>';
+        });
+
+        freebetPersonSelect.addEventListener('change', () => {
+            const personId = freebetPersonSelect.value;
+            const selectedPerson = people.find(p => p.id === personId);
+            freebetPlatformSelect.disabled = !selectedPerson;
+            freebetPlatformSelect.innerHTML = selectedPerson ? selectedPerson.platforms.map(p => `<option value="${p.id}">${p.name}</option>`).join('') : '<option value="">Selecione a Plataforma</option>';
+        });
+
         addPersonForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const personName = $('person-name-input').value;
-            if (personName.trim() === '') {
-                alert('Por favor, digite um nome válido.');
-                return;
+            const personName = addPersonInput.value;
+            if (personName) {
+                try {
+                    await addDoc(collection(db, `users/${auth.currentUser.uid}/people`), {
+                        name: personName,
+                        platforms: []
+                    });
+                    addPersonForm.reset();
+                    updateAll();
+                } catch (e) {
+                    console.error("Erro ao adicionar pessoa: ", e);
+                    alert('Erro ao adicionar pessoa. Tente novamente.');
+                }
             }
+        });
+
+        addFreebetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const personId = document.getElementById('freebet-person').value;
+            const platformId = document.getElementById('freebet-platform').value;
+            const stake = parseFloat(document.getElementById('freebet-stake').value);
+            const quantity = parseInt(document.getElementById('freebet-quantity').value, 10);
+            const received = document.getElementById('freebet-received').value === 'true';
+
+            const person = people.find(p => p.id === personId);
+            const platform = person.platforms.find(p => p.id === platformId);
+
             try {
-                await addDoc(collection(db, `users/${auth.currentUser.uid}/people`), {
-                    name: personName,
-                    platforms: []
+                await addDoc(collection(db, `users/${auth.currentUser.uid}/freebets`), {
+                    personId,
+                    personName: person.name,
+                    platformId,
+                    platformName: platform.name,
+                    stake,
+                    quantity,
+                    received
                 });
-                alert('Pessoa adicionada com sucesso!');
-                addPersonForm.reset();
+                alert('Freebet adicionada com sucesso!');
+                addFreebetForm.reset();
                 updateAll();
             } catch (e) {
-                console.error("Erro ao adicionar pessoa: ", e);
-                alert('Erro ao adicionar pessoa. Tente novamente.');
+                console.error("Erro ao adicionar freebet: ", e);
+                alert('Erro ao adicionar freebet. Tente novamente.');
             }
         });
 
-        // Deletar Pessoa
-        const deletePerson = async (id) => {
-            if (confirm('Tem certeza que deseja excluir esta pessoa?')) {
+        gainsPersonSelect.addEventListener('change', () => {
+            const personId = gainsPersonSelect.value;
+            const selectedPerson = people.find(p => p.id === personId);
+            gainsPlatformSelect.disabled = !selectedPerson;
+            gainsPlatformSelect.innerHTML = selectedPerson ? selectedPerson.platforms.map(p => `<option value="${p.id}">${p.name}</option>`).join('') : '<option value="">Selecione a Plataforma</option>';
+        });
+
+        addGainsBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const personId = gainsPersonSelect.value;
+            const platformId = gainsPlatformSelect.value;
+            const amount = parseFloat(gainsAmountInput.value);
+
+            if (!personId || !platformId || isNaN(amount)) {
+                alert('Por favor, preencha todos os campos corretamente.');
+                return;
+            }
+
+            const person = people.find(p => p.id === personId);
+            const platform = person.platforms.find(p => p.id === platformId);
+            
+            try {
+                await addDoc(collection(db, `users/${auth.currentUser.uid}/gains`), {
+                    date: new Date().toISOString().split('T')[0],
+                    personId,
+                    personName: person.name,
+                    platformId,
+                    platformName: platform.name,
+                    amount
+                });
+                alert('Levantamento de ganho adicionado com sucesso!');
+                gainsAmountInput.value = '';
+                updateAll();
+            } catch (e) {
+                console.error("Erro ao adicionar levantamento: ", e);
+                alert('Erro ao adicionar levantamento. Tente novamente.');
+            }
+        });
+
+        clearBetDataBtn.addEventListener('click', async () => {
+            if (confirm("Tem certeza que deseja limpar TODOS os dados do seu gerenciador? Esta ação é irreversível.")) {
                 try {
-                    await deleteDoc(doc(db, `users/${auth.currentUser.uid}/people`, id));
-                    alert('Pessoa excluída com sucesso!');
+                    const userId = auth.currentUser.uid;
+                    const collectionsToClear = ['bets', 'people', 'freebets', 'gains'];
+                    for (const collectionName of collectionsToClear) {
+                        const q = query(collection(db, `users/${userId}/${collectionName}`));
+                        const snapshot = await getDocs(q);
+                        const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+                        await Promise.all(deletePromises);
+                    }
+                    alert('Todos os dados foram limpos com sucesso!');
                     updateAll();
                 } catch (e) {
-                    console.error("Erro ao excluir pessoa: ", e);
-                    alert('Erro ao excluir pessoa. Tente novamente.');
-                }
-            }
-        };
-
-        // Adicionar Plataforma
-        addPlatformForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const personId = $('platform-person-id').value;
-            const name = $('platform-name').value;
-            if (personId && name) {
-                try {
-                    const personRef = doc(db, `users/${auth.currentUser.uid}/people`, personId);
-                    const personDoc = await getDoc(personRef);
-                    if (personDoc.exists()) {
-                        const personData = personDoc.data();
-                        const newPlatformId = Math.random().toString(36).substring(2, 10);
-                        personData.platforms.push({ id: newPlatformId, name: name });
-                        await updateDoc(personRef, { platforms: personData.platforms });
-                        alert('Plataforma adicionada com sucesso!');
-                        addPlatformForm.reset();
-                        updateAll();
-                    }
-                } catch (e) {
-                    console.error("Erro ao adicionar plataforma: ", e);
-                    alert('Erro ao adicionar plataforma. Tente novamente.');
+                    console.error('Erro ao limpar dados:', e);
+                    alert('Erro ao limpar os dados. Tente novamente.');
                 }
             }
         });
 
-        // Deletar Plataforma
-        const deletePlatform = async (personId, platformId) => {
-            if (confirm('Tem certeza que deseja excluir esta plataforma?')) {
-                try {
-                    const personRef = doc(db, `users/${auth.currentUser.uid}/people`, personId);
-                    const personDoc = await getDoc(personRef);
-                    if (personDoc.exists()) {
-                        const personData = personDoc.data();
-                        const updatedPlatforms = personData.platforms.filter(p => p.id !== platformId);
-                        await updateDoc(personRef, { platforms: updatedPlatforms });
-                        alert('Plataforma excluída com sucesso!');
-                        updateAll();
-                    }
-                } catch (e) {
-                    console.error("Erro ao excluir plataforma: ", e);
-                    alert('Erro ao excluir plataforma. Tente novamente.');
-                }
-            }
-        };
-        
-        // Adicionar Transação
-        addTransactionForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const personId = document.getElementById('transaction-person-id').value;
-            const platformId = document.getElementById('transaction-platform-id').value;
-            const type = document.getElementById('transaction-type').value;
-            const amount = parseFloat(document.getElementById('transaction-amount').value);
-
-            if (personId && platformId && type && amount) {
-                const transactionRef = collection(db, `users/${auth.currentUser.uid}/transactions`);
-                try {
-                    await addDoc(transactionRef, {
-                        personId,
-                        platformId,
-                        type,
-                        amount,
-                        timestamp: serverTimestamp()
-                    });
-                    alert('Transação adicionada com sucesso!');
-                    addTransactionForm.reset();
-                    updateAll();
-                } catch (e) {
-                console.error("Erro ao adicionar transação: ", e);
-                alert('Erro ao adicionar transação. Tente novamente.');
-            }
-            }
-        });
-
-        // Função para importar dados do JSON para o Firebase
-        const importDataToFirebase = () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-
-            input.onchange = async (event) => {
-                const file = event.target.files[0];
-                if (!file) {
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-                        const batch = db.batch();
-
-                        if (importedData.people) {
-                            importedData.people.forEach(person => {
-                                const newPersonRef = doc(db, `users/${auth.currentUser.uid}/people`, person.id);
-                                batch.set(newPersonRef, { name: person.name, platforms: person.platforms });
-                            });
-                        }
-                        if (importedData.bets) {
-                            importedData.bets.forEach(bet => {
-                                const newBetRef = doc(db, `users/${auth.currentUser.uid}/bets`, bet.id);
-                                batch.set(newBetRef, bet);
-                            });
-                        }
-                        
-                        await batch.commit();
-                        alert('Dados importados com sucesso para o Firebase!');
-                        updateAll();
-                    } catch (error) {
-                        alert('Erro ao importar o arquivo. Verifique se o arquivo JSON está no formato correto.');
-                        console.error('Erro ao ler ou importar o arquivo JSON:', error);
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        };
-
-        // Autenticação e Carregamento
-        auth.onAuthStateChanged(user => {
+        // Auth
+        onAuthStateChanged(auth, (user) => {
             if (user) {
                 authContainer.style.display = 'none';
                 mainContent.style.display = 'block';
-                userDisplay.textContent = `Olá, ${user.email}`;
-                if (!isDataLoaded) {
-                    updateAll();
-                    isDataLoaded = true;
-                }
+                console.log("Usuário logado:", user.email);
+                updateAll();
             } else {
                 authContainer.style.display = 'block';
                 mainContent.style.display = 'none';
-                userDisplay.textContent = '';
-                isDataLoaded = false;
+                console.log("Nenhum usuário logado.");
             }
         });
 
-        showRegisterButton.addEventListener('click', () => {
-            loginForm.classList.add('hidden');
-            registerForm.classList.remove('hidden');
-        });
-
-        showLoginButton.addEventListener('click', () => {
-            registerForm.classList.add('hidden');
-            loginForm.classList.remove('hidden');
+        registerButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            authErrorMessage.textContent = '';
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    alert('Cadastro realizado com sucesso! Pode entrar.');
+                })
+                .catch((error) => {
+                    authErrorMessage.textContent = 'Erro ao cadastrar: ' + error.message;
+                });
         });
 
         loginButton.addEventListener('click', () => {
             const email = emailInput.value;
             const password = passwordInput.value;
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => alert('Login realizado com sucesso!'))
-                .catch(error => alert('Erro ao fazer login: ' + error.message));
+            authErrorMessage.textContent = '';
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    alert('Login realizado com sucesso!');
+                })
+                .catch((error) => {
+                    authErrorMessage.textContent = 'Erro ao fazer login: ' + error.message;
+                });
         });
 
-        registerButton.addEventListener('click', () => {
-            const email = registerEmailInput.value;
-            const password = registerPasswordInput.value;
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => alert('Cadastro realizado com sucesso! Faça login para começar.'))
-                .catch(error => alert('Erro ao cadastrar: ' + error.message));
+        logoutButton.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                alert('Você saiu da sua conta.');
+            }).catch((error) => {
+                console.error("Erro ao sair:", error);
+                alert('Erro ao sair da conta. Tente novamente.');
+            });
         });
 
-        logoutButton.addEventListener('click', () => auth.signOut());
     </script>
 </body>
 </html>
