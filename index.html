@@ -246,13 +246,132 @@
     const peopleTabBtn = document.querySelector('[data-tab="people"]');
     const withdrawalsTabBtn = document.querySelector('[data-tab="withdrawals"]');
 
+    // Funções de Utilitário
+    const formatCurrency = (amount) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
+
+    // Funções para renderização (certifique-se de que não há duplicatas em seu arquivo)
+    const renderBets = (betsToRender) => {
+        betsTableBody.innerHTML = '';
+        betsToRender.forEach(bet => {
+            const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
+            const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
+            const row = document.createElement('tr');
+            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
+            row.innerHTML = `
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.date}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.description}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.personName}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.platformName}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.type}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.stake)}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.odds}</td>
+                <td class="px-4 py-2 text-sm font-semibold ${resultColorClass}">${bet.result}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.return)}</td>
+                <td class="px-4 py-2 text-sm font-semibold ${profitColorClass}">${formatCurrency(bet.profit)}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                    <button class="edit-bet-btn bg-neutral-800 text-white px-2 py-1 rounded-md text-xs hover:bg-neutral-700 transition duration-300" data-id="${bet.id}">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="delete-bet-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${bet.id}">
+                        <i class="fas fa-trash-alt"></i> Deletar
+                    </button>
+                </td>
+            `;
+            betsTableBody.appendChild(row);
+        });
+    };
+
+    const renderHistory = (historyToRender) => {
+        historyTableBody.innerHTML = '';
+        historyToRender.forEach(bet => {
+            const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
+            const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
+            const row = document.createElement('tr');
+            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
+            row.innerHTML = `
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.date}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.description}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.personName}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.platformName}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.type}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.stake)}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${bet.odds}</td>
+                <td class="px-4 py-2 text-sm font-semibold ${resultColorClass}">${bet.result}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.return)}</td>
+                <td class="px-4 py-2 text-sm font-semibold ${profitColorClass}">${formatCurrency(bet.profit)}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                    <button class="edit-bet-btn bg-neutral-800 text-white px-2 py-1 rounded-md text-xs hover:bg-neutral-700 transition duration-300" data-id="${bet.id}">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="delete-bet-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${bet.id}">
+                        <i class="fas fa-trash-alt"></i> Deletar
+                    </button>
+                </td>
+            `;
+            historyTableBody.appendChild(row);
+        });
+    };
+
     // Variáveis Globais de Dados
     let people = [];
     let bets = [];
     let freebets = [];
     let currentPersonId = null;
 
-    // Novo listener para as tabs (mantido do código original)
+    // Funções de Carregamento de Dados
+    const loadBets = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/bets`));
+        bets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const openBets = bets.filter(bet => bet.result === 'Aberta' || bet.result === 'Aberta FB');
+        const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB');
+        renderBets(openBets);
+        renderHistory(finishedBets);
+        updateAll();
+    };
+
+    const loadPeople = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people`));
+        people = await Promise.all(querySnapshot.docs.map(async doc => {
+            const platformsSnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people/${doc.id}/platforms`));
+            const platforms = platformsSnapshot.docs.map(platDoc => ({ id: platDoc.id, ...platDoc.data() }));
+            const totalBalance = platforms.reduce((sum, p) => sum + (p.balance || 0), 0);
+            return { id: doc.id, ...doc.data(), platforms, totalBalance };
+        }));
+    };
+
+    const loadFreebets = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/freebets`));
+        freebets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    };
+
+    const updateBankroll = () => {
+        const totalBankroll = people.reduce((sum, p) => sum + (p.totalBalance || 0), 0);
+        document.getElementById('current-bankroll').textContent = formatCurrency(totalBankroll);
+    };
+
+    const updateProfitLoss = () => {
+        const totalProfitLoss = bets.reduce((sum, bet) => sum + (bet.profit || 0), 0);
+        const profitLossElement = document.getElementById('profit-loss');
+        if (totalProfitLoss >= 0) {
+            profitLossElement.textContent = `+${formatCurrency(totalProfitLoss)}`;
+            profitLossElement.classList.remove('text-red-500');
+            profitLossElement.classList.add('text-green-500');
+        } else {
+            profitLossElement.textContent = formatCurrency(totalProfitLoss);
+            profitLossElement.classList.remove('text-green-500');
+            profitLossElement.classList.add('text-red-500');
+        }
+    };
+    
+    const updateAll = () => {
+        updateBankroll();
+        updateProfitLoss();
+    };
+
+    // Listener para as tabs
     document.querySelectorAll('.tab-btn').forEach(button => {
         button.addEventListener('click', () => {
             const tab = button.dataset.tab;
@@ -282,7 +401,7 @@
             db = getFirestore(app);
             auth = getAuth(app);
             
-            // Listener de estado de autenticação
+            // Este listener DEVE estar aqui, após o 'auth' ser inicializado
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     authContainer.classList.add('hidden');
@@ -331,138 +450,11 @@
                 });
             });
 
-            // Se você quiser o formulário de aposta funcionando, o listener precisa estar aqui
-            const betForm = document.getElementById('bet-form');
-            if(betForm) {
-                betForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    // ... (resto do seu código do formulário de aposta) ...
-                    const date = document.getElementById('date').value;
-                    const description = document.getElementById('description').value;
-                    const personId = personSelect.value;
-                    const platformId = platformSelect.value;
-                    const type = document.getElementById('type').value;
-                    const stake = parseFloat(document.getElementById('stake').value);
-                    const odds = parseFloat(document.getElementById('odds').value);
-                    const result = document.getElementById('result').value;
-
-                    let profit = 0;
-                    let retorno = 0;
-                    if (result === 'Green') {
-                        retorno = stake * odds;
-                        profit = retorno - stake;
-                    } else if (result === 'Half Green') {
-                        retorno = (stake * odds) / 2 + stake / 2;
-                        profit = retorno - stake;
-                    } else if (result === 'Red') {
-                        profit = -stake;
-                    } else if (result === 'Half Red') {
-                        profit = -stake / 2;
-                    } else if (result === 'Void') {
-                        profit = 0;
-                        retorno = stake;
-                    }
-
-                    try {
-                        await addDoc(collection(db, `users/${auth.currentUser.uid}/bets`), {
-                            date,
-                            description,
-                            personId,
-                            personName: 'Nome da Pessoa', // Aqui precisa ser corrigido para a pessoa real
-                            platformId,
-                            platformName: 'Nome da Plataforma', // Aqui precisa ser corrigido para a plataforma real
-                            type,
-                            stake,
-                            odds,
-                            result,
-                            return: retorno,
-                            profit,
-                        });
-                        alert('Aposta adicionada com sucesso!');
-                        betForm.reset();
-                        loadBets();
-                    } catch (e) {
-                        console.error("Erro ao adicionar documento: ", e);
-                        alert('Erro ao adicionar aposta. Tente novamente.');
-                    }
-                });
-            }
-
-
         } catch (error) {
             console.error("Erro ao carregar a configuração do Firebase:", error);
             alert("Erro ao carregar a aplicação. Por favor, tente novamente mais tarde.");
         }
     }
-
-    // Funções de Renderização
-    const renderBets = (betsToRender) => {
-        const betsTableBody = document.getElementById('bets-table-body');
-        if (!betsTableBody) return;
-        betsTableBody.innerHTML = '';
-        betsToRender.forEach(bet => {
-            const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
-            const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
-
-            const row = document.createElement('tr');
-            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
-            row.innerHTML = `
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.date}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.description}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.personName}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.platformName}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.type}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.stake)}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.odds}</td>
-                <td class="px-4 py-2 text-sm font-semibold ${resultColorClass}">${bet.result}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.return)}</td>
-                <td class="px-4 py-2 text-sm font-semibold ${profitColorClass}">${formatCurrency(bet.profit)}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                    <button class="edit-bet-btn bg-neutral-800 text-white px-2 py-1 rounded-md text-xs hover:bg-neutral-700 transition duration-300" data-id="${bet.id}">
-                        <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button class="delete-bet-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${bet.id}">
-                        <i class="fas fa-trash-alt"></i> Deletar
-                    </button>
-                </td>
-            `;
-            betsTableBody.appendChild(row);
-        });
-    };
-
-    const renderHistory = (historyToRender) => {
-        const historyTableBody = document.getElementById('history-table-body');
-        if (!historyTableBody) return;
-        historyTableBody.innerHTML = '';
-        historyToRender.forEach(bet => {
-            const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
-            const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
-
-            const row = document.createElement('tr');
-            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
-            row.innerHTML = `
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.date}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.description}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.personName}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.platformName}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.type}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.stake)}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${bet.odds}</td>
-                <td class="px-4 py-2 text-sm font-semibold ${resultColorClass}">${bet.result}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(bet.return)}</td>
-                <td class="px-4 py-2 text-sm font-semibold ${profitColorClass}">${formatCurrency(bet.profit)}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                    <button class="edit-bet-btn bg-neutral-800 text-white px-2 py-1 rounded-md text-xs hover:bg-neutral-700 transition duration-300" data-id="${bet.id}">
-                        <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button class="delete-bet-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${bet.id}">
-                        <i class="fas fa-trash-alt"></i> Deletar
-                    </button>
-                </td>
-            `;
-            historyTableBody.appendChild(row);
-        });
-    };
 
     const renderFreebets = (freebetsToRender) => {
         const freebetsTableBody = document.getElementById('freebets-table-body');
@@ -542,74 +534,6 @@
         });
     };
 
-    // Funções de Carregamento de Dados do Firestore
-    const loadBets = async () => {
-        if (!auth.currentUser) return;
-        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/bets`));
-        bets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const openBets = bets.filter(bet => bet.result === 'Aberta' || bet.result === 'Aberta FB');
-        const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB');
-        renderBets(openBets);
-        renderHistory(finishedBets);
-        updateAll();
-    };
-
-    const loadPeople = async () => {
-        if (!auth.currentUser) return;
-        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people`));
-        people = await Promise.all(querySnapshot.docs.map(async doc => {
-            const platformsSnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people/${doc.id}/platforms`));
-            const platforms = platformsSnapshot.docs.map(platDoc => ({ id: platDoc.id, ...platDoc.data() }));
-            const totalBalance = platforms.reduce((sum, p) => sum + (p.balance || 0), 0);
-            return { id: doc.id, ...doc.data(), platforms, totalBalance };
-        }));
-        renderPeople(people);
-    };
-
-    const loadFreebets = async () => {
-        if (!auth.currentUser) return;
-        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/freebets`));
-        freebets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderFreebets(freebets);
-    };
-
-    // Funções de Atualização
-    const updateBankroll = () => {
-        const totalBankroll = people.reduce((sum, p) => sum + (p.totalBalance || 0), 0);
-        document.getElementById('current-bankroll').textContent = formatCurrency(totalBankroll);
-    };
-
-    const updateProfitLoss = () => {
-        const totalProfitLoss = bets.reduce((sum, bet) => sum + (bet.profit || 0), 0);
-        const profitLossElement = document.getElementById('profit-loss');
-        if (totalProfitLoss >= 0) {
-            profitLossElement.textContent = `+${formatCurrency(totalProfitLoss)}`;
-            profitLossElement.classList.remove('text-red-500');
-            profitLossElement.classList.add('text-green-500');
-        } else {
-            profitLossElement.textContent = formatCurrency(totalProfitLoss);
-            profitLossElement.classList.remove('text-green-500');
-            profitLossElement.classList.add('text-red-500');
-        }
-    };
-
-    const updateTotalBets = () => {
-        document.getElementById('total-bets').textContent = bets.length;
-    };
-
-    const updateROI = () => {
-        const totalInvested = bets.reduce((sum, bet) => sum + (bet.stake || 0), 0);
-        const totalProfitLoss = bets.reduce((sum, bet) => sum + (bet.profit || 0), 0);
-        const roi = totalInvested > 0 ? (totalProfitLoss / totalInvested) * 100 : 0;
-        document.getElementById('roi').textContent = `${roi.toFixed(2)}%`;
-    };
-
-    const updateAll = () => {
-        updateBankroll();
-        updateProfitLoss();
-        updateTotalBets();
-        updateROI();
-    };
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
