@@ -26,7 +26,6 @@
         .tab-content.active {
             display: block;
         }
-        /* Corrigindo o input de data para o tema escuro */
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
         }
@@ -143,6 +142,37 @@
                 <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
                     <button type="submit" id="bet-form-button" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
                         Adicionar Aposta
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+            <h2 class="text-xl font-bold mb-4 text-white">Levantamento de Ganhos</h2>
+            <form id="withdrawal-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="withdrawal-date" class="block text-sm font-medium text-neutral-300">Data</label>
+                    <input type="date" id="withdrawal-date" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="withdrawal-person" class="block text-sm font-medium text-neutral-300">Pessoa</label>
+                    <select id="withdrawal-person" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                        <option value="">Selecione a Pessoa</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="withdrawal-platform" class="block text-sm font-medium text-neutral-300">Plataforma</label>
+                    <select id="withdrawal-platform" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
+                        <option value="">Selecione a Plataforma</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="withdrawal-value" class="block text-sm font-medium text-neutral-300">Valor (R$)</label>
+                    <input type="number" step="0.01" id="withdrawal-value" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
+                        Adicionar Levantamento
                     </button>
                 </div>
             </form>
@@ -311,43 +341,24 @@
 
     <div id="tab-ganhos" class="tab-content">
         <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
-            <h2 class="text-xl font-bold mb-4 text-white">Levantamento de Ganhos</h2>
-            <form id="withdrawal-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label for="withdrawal-date" class="block text-sm font-medium text-neutral-300">Data</label>
-                    <input type="date" id="withdrawal-date" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+            <h2 class="text-xl font-bold mb-4 text-white">Resumo de Ganhos</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-zinc-900 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">Lucro Diário</p>
+                    <p id="daily-gain" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
                 </div>
-                <div>
-                    <label for="withdrawal-person" class="block text-sm font-medium text-neutral-300">Pessoa</label>
-                    <select id="withdrawal-person" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
-                        <option value="">Selecione a Pessoa</option>
-                    </select>
+                <div class="bg-zinc-900 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">Lucro Mensal</p>
+                    <p id="monthly-gain" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
                 </div>
-                <div>
-                    <label for="withdrawal-platform" class="block text-sm font-medium text-neutral-300">Plataforma</label>
-                    <select id="withdrawal-platform" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
-                        <option value="">Selecione a Plataforma</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="withdrawal-value" class="block text-sm font-medium text-neutral-300">Valor (R$)</label>
-                    <input type="number" step="0.01" id="withdrawal-value" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
-                </div>
-                <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
-                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
-                        Adicionar Levantamento
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-white">Histórico de Levantamentos</h2>
-                <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
-                    <p class="text-sm text-neutral-400">Total Levantado</p>
-                    <p id="total-withdrawals" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
+                <div class="bg-zinc-900 p-4 rounded-xl text-center shadow-inner">
+                    <p class="text-sm text-neutral-400">Lucro Anual</p>
+                    <p id="yearly-gain" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
                 </div>
             </div>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+            <h2 class="text-xl font-bold mb-4 text-white">Histórico de Levantamentos</h2>
             <table class="min-w-full divide-y divide-zinc-700">
                 <thead class="bg-zinc-900">
                 <tr>
@@ -370,7 +381,6 @@
     import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // Your web app's Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
         authDomain: "betting-ledger-558f2.firebaseapp.com",
@@ -410,7 +420,10 @@
     const profitLossDisplay = $('profit-loss');
     const totalBetsDisplay = $('total-bets');
     const roiDisplay = $('roi');
-    const totalWithdrawalsDisplay = $('total-withdrawals');
+    const dailyGainDisplay = $('daily-gain');
+    const monthlyGainDisplay = $('monthly-gain');
+    const yearlyGainDisplay = $('yearly-gain');
+
     const betFormTitle = $('bet-form-title');
     const betFormButton = $('bet-form-button');
     const clearBetDataBtn = $('clear-bet-data-btn');
@@ -435,6 +448,32 @@
         }).format(value);
     };
 
+    const calculateGainsSummary = (finishedBets) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        const currentYear = new Date().toISOString().slice(0, 4);
+
+        const dailyGain = finishedBets
+            .filter(bet => bet.date === today)
+            .reduce((sum, bet) => sum + bet.profit, 0);
+
+        const monthlyGain = finishedBets
+            .filter(bet => bet.date.startsWith(currentMonth))
+            .reduce((sum, bet) => sum + bet.profit, 0);
+
+        const yearlyGain = finishedBets
+            .filter(bet => bet.date.startsWith(currentYear))
+            .reduce((sum, bet) => sum + bet.profit, 0);
+
+        dailyGainDisplay.textContent = formatCurrency(dailyGain);
+        monthlyGainDisplay.textContent = formatCurrency(monthlyGain);
+        yearlyGainDisplay.textContent = formatCurrency(yearlyGain);
+
+        dailyGainDisplay.className = `text-xl font-bold mt-1 ${dailyGain >= 0 ? 'text-green-500' : 'text-red-500'}`;
+        monthlyGainDisplay.className = `text-xl font-bold mt-1 ${monthlyGain >= 0 ? 'text-green-500' : 'text-red-500'}`;
+        yearlyGainDisplay.className = `text-xl font-bold mt-1 ${yearlyGain >= 0 ? 'text-green-500' : 'text-red-500'}`;
+    };
+
     const updateDashboard = () => {
         const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB');
         const totalStake = finishedBets.reduce((sum, bet) => sum + bet.stake, 0);
@@ -448,16 +487,17 @@
         profitLossDisplay.textContent = formatCurrency(totalProfit);
         totalBetsDisplay.textContent = totalBetsCount;
         roiDisplay.textContent = `${roi.toFixed(2)}%`;
-        totalWithdrawalsDisplay.textContent = formatCurrency(totalWithdrawals);
 
         profitLossDisplay.className = `text-xl font-bold mt-1 ${totalProfit >= 0 ? 'text-green-500' : 'text-red-500'}`;
         currentBankrollDisplay.className = `text-xl font-bold mt-1 ${currentBankroll >= 0 ? 'text-green-500' : 'text-red-500'}`;
+        
+        calculateGainsSummary(finishedBets);
     };
 
-    const renderBets = (betsToRender) => {
+    const renderBets = () => {
         betsTableBody.innerHTML = '';
         historyTableBody.innerHTML = '';
-        betsToRender.forEach(bet => {
+        bets.forEach(bet => {
             const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Half Green' ? 'text-green-400' : bet.result === 'Red' ? 'text-red-500' : bet.result === 'Half Red' ? 'text-red-400' : 'text-neutral-400';
             const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
             const row = document.createElement('tr');
@@ -599,7 +639,7 @@
         if (!auth.currentUser) return;
         const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/bets`));
         bets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderBets(bets);
+        renderBets();
         updateDashboard();
     };
 
@@ -610,7 +650,7 @@
         renderFreebets();
         updateDashboard();
     };
-
+    
     const loadWithdrawals = async () => {
         if (!auth.currentUser) return;
         const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/withdrawals`));
@@ -802,7 +842,7 @@
             }
         }
     });
-
+    
     addWithdrawalForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const date = $('withdrawal-date').value;
@@ -1003,7 +1043,6 @@
                 alert('Erro ao fazer login: ' + error.message);
             });
     });
-
 </script>
 </body>
 </html>
