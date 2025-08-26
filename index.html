@@ -33,194 +33,360 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .hidden {
+        .tab-content {
             display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            border-bottom: 2px solid white;
         }
     </style>
 </head>
-<body class="bg-zinc-900 min-h-screen flex flex-col">
+<body class="bg-zinc-950 text-neutral-200 p-4 min-h-screen flex flex-col items-center">
 
-    <div id="auth-container" class="auth-container bg-zinc-800 p-8 rounded-lg shadow-xl w-full max-w-sm mx-auto my-auto text-neutral-200">
-        <h2 class="text-2xl font-bold mb-6 text-center text-white">Betting Ledger</h2>
-        <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-neutral-400 mb-1">Email</label>
-            <input type="email" id="email" class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="seu-email@exemplo.com">
+<div id="auth-container" class="bg-gray-100 p-8 rounded-lg shadow-md max-w-sm mx-auto mt-20">
+    <h2 class="text-2xl font-bold text-center mb-6 text-black">Betting Ledger</h2>
+    <input type="email" id="email" placeholder="Email" class="w-full p-2 mb-4 border rounded-md text-black">
+    <input type="password" id="password" placeholder="Senha" class="w-full p-2 mb-6 border rounded-md text-black">
+    <button id="login-button" class="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors mb-2">Entrar</button>
+    <button id="register-button" class="w-full bg-gray-400 text-gray-800 p-2 rounded-md hover:bg-gray-500 transition-colors">Cadastrar</button>
+</div>
+<div class="container mx-auto p-6 bg-zinc-900 rounded-2xl shadow-lg w-full max-w-4xl" style="display: none;">
+    <h1 class="text-3xl font-bold text-center mb-6 text-white">Betting Ledger</h1>
+
+    <nav class="flex justify-center border-b border-zinc-700 mb-8">
+        <button id="btn-tab-gerenciador" class="tab-button active px-4 py-2 text-white font-semibold transition-colors duration-200">
+            Apostas
+        </button>
+        <button id="btn-tab-historico" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+            Histórico
+        </button>
+        <button id="btn-tab-freebets" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+            Freebets
+        </button>
+        <button id="btn-tab-pessoas" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+            Pessoas & Plataformas
+        </button>
+        <button id="btn-tab-ganhos" class="tab-button px-4 py-2 text-neutral-400 font-semibold hover:text-white transition-colors duration-200">
+            Levantamento de Ganhos
+        </button>
+    </nav>
+
+    <div id="tab-gerenciador" class="tab-content active">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                <p class="text-sm text-neutral-400">Bankroll Atual</p>
+                <p id="current-bankroll" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
+            </div>
+            <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                <p class="text-sm text-neutral-400">Lucro/Prejuízo</p>
+                <p id="profit-loss" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
+            </div>
+            <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                <p class="text-sm text-neutral-400">Total de Apostas</p>
+                <p id="total-bets" class="text-xl font-bold mt-1 text-white">0</p>
+            </div>
+            <div class="bg-zinc-800 p-4 rounded-xl text-center shadow-inner">
+                <p class="text-sm text-neutral-400">ROI (%)</p>
+                <p id="roi" class="text-xl font-bold mt-1 text-white">0.00%</p>
+            </div>
         </div>
-        <div class="mb-6">
-            <label for="password" class="block text-sm font-medium text-neutral-400 mb-1">Senha</label>
-            <input type="password" id="password" class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="********">
+
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+            <h2 class="text-xl font-bold mb-4 text-white" id="bet-form-title">Adicionar Nova Aposta</h2>
+            <form id="bet-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="date" class="block text-sm font-medium text-neutral-300">Data</label>
+                    <input type="date" id="date" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-neutral-300">Evento / Descrição</label>
+                    <input type="text" id="description" placeholder="Ex: Jogo de futebol" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="person" class="block text-sm font-medium text-neutral-300">Pessoa</label>
+                    <select id="person" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                        <option value="">Selecione a Pessoa</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="platform" class="block text-sm font-medium text-neutral-300">Plataforma</label>
+                    <select id="platform" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
+                        <option value="">Selecione a Plataforma</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="type" class="block text-sm font-medium text-neutral-300">Tipo</label>
+                    <select id="type" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50">
+                        <option value="Normal">Normal</option>
+                        <option value="Missao">Missão</option>
+                        <option value="Bonus">Bônus</option>
+                        <option value="Freebet">Freebet</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="stake" class="block text-sm font-medium text-neutral-300">Valor Apostado (R$)</label>
+                    <input type="number" step="0.001" id="stake" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="odds" class="block text-sm font-medium text-neutral-300">Odds</label>
+                    <input type="number" step="0.001" id="odds" placeholder="Ex: 2.50" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="result" class="block text-sm font-medium text-neutral-300">Resultado</label>
+                    <select id="result" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50">
+                        <option value="">Selecione</option>
+                        <option value="Green">Green (Ganhou)</option>
+                        <option value="Half Green">Meio Green</option>
+                        <option value="Red">Red (Perdeu)</option>
+                        <option value="Half Red">Meio Red</option>
+                        <option value="Void">Void (Anulada)</option>
+                        <option value="Aberta">Aberta (Não finalizada)</option>
+                        <option value="Aberta FB">Aberta FB (não finalizado)</option>
+                        <option value="Red FB">Red FB (Perdeu)</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
+                    <button type="submit" id="bet-form-button" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
+                        Adicionar Aposta
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="flex flex-col gap-4">
-            <button id="login-button" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition duration-300">Login</button>
-            <button id="register-button" class="w-full bg-zinc-600 text-white py-2 rounded-md font-semibold hover:bg-zinc-700 transition duration-300">Criar Conta</button>
+
+        <div id="message-box" class="hidden p-4 rounded-md mb-4 text-center text-sm"></div>
+
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-white">Apostas Abertas</h2>
+                <button id="clear-bet-data-btn" class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition duration-300">
+                    Limpar Todos os Dados
+                </button>
+            </div>
+            <table class="min-w-full divide-y divide-zinc-700">
+                <thead class="bg-zinc-900">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Data</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Descrição</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Tipo</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor Apostado</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Odds</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Resultado</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Retorno</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Lucro</th>
+                    <th class="px-4 py-2 whitespace-nowrap text-sm font-medium text-neutral-400 uppercase tracking-wider w-1/4">Ações</th>
+                </tr>
+                </thead>
+                <tbody id="bets-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8 max-w-5xl hidden" id="main-content">
-        <header class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Betting Ledger</h1>
-            <button id="sign-out-btn" class="bg-red-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-red-600 transition duration-300 hidden">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </button>
-        </header>
+    <div id="tab-historico" class="tab-content">
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-white">Histórico de Apostas Finalizadas</h2>
+            </div>
+            <table class="min-w-full divide-y divide-zinc-700">
+                <thead class="bg-zinc-900">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Data</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Descrição</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Tipo</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor Apostado</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Odds</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Resultado</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Retorno</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Lucro</th>
+                    <th class="px-4 py-2 whitespace-nowrap text-sm font-medium text-neutral-400 uppercase tracking-wider">Ações</th>
+                </tr>
+                </thead>
+                <tbody id="history-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-md">
-                <h3 class="text-neutral-400 text-sm font-medium">Bankroll Atual</h3>
-                <p id="current-bankroll" class="text-xl font-bold text-white mt-1">R$ 0,00</p>
-            </div>
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-md">
-                <h3 class="text-neutral-400 text-sm font-medium">Lucro/Prejuízo</h3>
-                <p id="profit-loss" class="text-xl font-bold text-green-500 mt-1">+R$ 0,00</p>
-            </div>
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-md">
-                <h3 class="text-neutral-400 text-sm font-medium">Total de Apostas</h3>
-                <p id="total-bets" class="text-xl font-bold text-white mt-1">0</p>
-            </div>
-            <div class="bg-zinc-800 p-4 rounded-lg shadow-md">
-                <h3 class="text-neutral-400 text-sm font-medium">ROI</h3>
-                <p id="roi" class="text-xl font-bold text-white mt-1">0%</p>
-            </div>
-        </section>
+    <div id="tab-freebets" class="tab-content">
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+            <h2 class="text-xl font-bold mb-4 text-white">Adicionar Freebet</h2>
+            <form id="freebet-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="freebet-person" class="block text-sm font-medium text-neutral-300">Pessoa</label>
+                    <select id="freebet-person" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                        <option value="">Selecione a Pessoa</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="freebet-platform" class="block text-sm font-medium text-neutral-300">Plataforma</label>
+                    <select id="freebet-platform" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required disabled>
+                        <option value="">Selecione a Plataforma</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="freebet-stake" class="block text-sm font-medium text-neutral-300">Valor (R$)</label>
+                    <input type="number" step="0.01" id="freebet-stake" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="freebet-quantity" class="block text-sm font-medium text-neutral-300">Quantidade</label>
+                    <input type="number" id="freebet-quantity" value="1" min="1" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                </div>
+                <div>
+                    <label for="freebet-received" class="block text-sm font-medium text-neutral-300">Recebida?</label>
+                    <select id="freebet-received" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="freebet-expiration" class="block text-sm font-medium text-neutral-300">Data de Vencimento</label>
+                    <input type="date" id="freebet-expiration" class="mt-1 block w-full rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50">
+                </div>
+                <div class="sm:col-span-2 lg:col-span-4 flex justify-center mt-4">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
+                        Adicionar Freebet
+                    </button>
+                </div>
+            </form>
+        </div>
 
-        <nav class="flex space-x-2 mb-8">
-            <button class="tab-btn px-4 py-2 rounded-t-lg font-semibold bg-zinc-700 text-white" data-tab="bets">Apostas</button>
-            <button class="tab-btn px-4 py-2 rounded-t-lg font-semibold bg-zinc-800 text-neutral-400 hover:bg-zinc-700 transition duration-300" data-tab="history">Histórico</button>
-            <button class="tab-btn px-4 py-2 rounded-t-lg font-semibold bg-zinc-800 text-neutral-400 hover:bg-zinc-700 transition duration-300" data-tab="freebets">Freebets</button>
-            <button class="tab-btn px-4 py-2 rounded-t-lg font-semibold bg-zinc-800 text-neutral-400 hover:bg-zinc-700 transition duration-300" data-tab="people">Pessoas & Plataformas</button>
-            <button class="tab-btn px-4 py-2 rounded-t-lg font-semibold bg-zinc-800 text-neutral-400 hover:bg-zinc-700 transition duration-300" data-tab="withdrawals">Levantamento</button>
-        </nav>
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+            <h2 class="text-xl font-bold mb-4 text-white">Freebets Não Utilizadas</h2>
+            <table class="min-w-full divide-y divide-zinc-700">
+                <thead class="bg-zinc-900">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Valor</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Recebida?</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Vencimento</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Ações</th>
+                </tr>
+                </thead>
+                <tbody id="freebets-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <div id="bets-tab" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4 text-white">Apostas Abertas</h2>
-            <div class="bg-zinc-800 p-6 rounded-lg shadow-md">
-                <form id="bet-form" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <div>
-                            <label for="date" class="block text-sm font-medium text-neutral-400 mb-1">Data</label>
-                            <input type="date" id="date" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="description" class="block text-sm font-medium text-neutral-400 mb-1">Descrição</label>
-                            <input type="text" id="description" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="person" class="block text-sm font-medium text-neutral-400 mb-1">Pessoa</label>
-                            <select id="person" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-                        </div>
-                        <div>
-                            <label for="platform" class="block text-sm font-medium text-neutral-400 mb-1">Plataforma</label>
-                            <select id="platform" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-                        </div>
-                        <div>
-                            <label for="type" class="block text-sm font-medium text-neutral-400 mb-1">Tipo</label>
-                            <input type="text" id="type" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="stake" class="block text-sm font-medium text-neutral-400 mb-1">Valor da Aposta (Stake)</label>
-                            <input type="number" step="0.01" id="stake" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="odds" class="block text-sm font-medium text-neutral-400 mb-1">Odds</label>
-                            <input type="number" step="0.01" id="odds" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="result" class="block text-sm font-medium text-neutral-400 mb-1">Resultado</label>
-                            <select id="result" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="Aberta">Aberta</option>
-                                <option value="Green">Green</option>
-                                <option value="Red">Red</option>
-                                <option value="Half Green">Half Green</option>
-                                <option value="Half Red">Half Red</option>
-                                <option value="Void">Void</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition duration-300">
-                        Adicionar Aposta
+    <div id="tab-pessoas" class="tab-content">
+        <div id="people-list-view">
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+                <h2 class="text-xl font-bold mb-4 text-white">Adicionar Nova Pessoa</h2>
+                <form id="person-form" class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" id="person-name" placeholder="Nome da Pessoa" class="flex-1 rounded-md border-zinc-700 bg-zinc-900 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                    <button type="submit" class="px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-600 transition duration-300">
+                        Adicionar Pessoa
                     </button>
                 </form>
             </div>
-            <div class="mt-8 overflow-x-auto">
-                <h3 class="text-xl font-bold mb-4 text-white">Lista de Apostas</h3>
-                <table class="w-full text-left table-auto">
-                    <thead>
-                        <tr class="bg-zinc-700">
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Data</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Descrição</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Pessoa</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Plataforma</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Tipo</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Stake</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Odds</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Resultado</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Retorno</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Lucro</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bets-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <div id="history-tab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-white">Histórico de Apostas</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left table-auto">
-                    <thead>
-                        <tr class="bg-zinc-700">
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Data</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Descrição</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Pessoa</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Plataforma</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Tipo</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Stake</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Odds</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Resultado</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Retorno</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Lucro</th>
-                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="freebets-tab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-white">Freebets</h2>
-            </div>
-
-        <div id="people-tab" class="tab-content hidden">
-            <div id="people-list-view">
-                <h2 class="text-2xl font-bold mb-4 text-white">Pessoas & Plataformas</h2>
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner overflow-x-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-white">Pessoas Cadastradas</h2>
+                    <button id="clear-people-btn" class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition duration-300">
+                        Limpar Pessoas
+                    </button>
                 </div>
-            <div id="platforms-management-view" class="hidden">
-                <button id="back-to-people-btn" class="bg-zinc-600 text-white px-4 py-2 rounded-md font-semibold mb-4 hover:bg-zinc-700 transition duration-300">
-                    <i class="fas fa-arrow-left"></i> Voltar para Pessoas
+                <table class="min-w-full divide-y divide-zinc-700">
+                    <thead class="bg-zinc-900">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Pessoa</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Saldo Total</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-neutral-400 uppercase tracking-wider w-1/5">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="people-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="platforms-management-view" class="hidden">
+            <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+                <button id="back-to-people-btn" class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition duration-300 mb-4">
+                    ← Voltar para Pessoas
                 </button>
-                <div class="mb-4">
-                    <h3 class="text-xl font-bold text-white mb-2">Plataformas de <span id="current-person-name"></span></h3>
-                </div>
-                </div>
-        </div>
+                <h2 class="text-xl font-bold mb-4 text-white" id="current-person-name"></h2>
 
-        <div id="withdrawals-tab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-white">Levantamento de Ganhos</h2>
+                <div class="bg-zinc-700 p-4 rounded-xl shadow-inner mb-6">
+                    <h3 class="text-lg font-semibold mb-2 text-neutral-200">Adicionar Nova Plataforma</h3>
+                    <form id="platform-form" class="flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="platform-name" placeholder="Nome da Plataforma" class="flex-1 rounded-md border-zinc-600 bg-zinc-800 text-neutral-200 p-2 shadow-sm focus:border-white focus:ring focus:ring-neutral-400 focus:ring-opacity-50" required>
+                        <button type="submit" class="px-6 py-2 bg-neutral-800 text-white rounded-md shadow-lg hover:bg-neutral-700">
+                            Adicionar
+                        </button>
+                    </form>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <h3 class="text-lg font-semibold mb-2 text-neutral-200">Plataformas</h3>
+                    <table class="min-w-full divide-y divide-zinc-700">
+                        <thead class="bg-zinc-800">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Plataforma</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Saldo</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-neutral-400 uppercase tracking-wider w-1/4">Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="platforms-table-body" class="bg-zinc-900 divide-y divide-zinc-800">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="transaction-form-container" class="hidden bg-zinc-700 p-4 rounded-xl shadow-inner mt-6">
+                    <h3 class="text-lg font-bold mb-2 text-white" id="transaction-title">Ajustar Saldo</h3>
+                    <div class="mb-4 text-sm text-neutral-300">Saldo Atual: <span id="current-platform-balance" class="font-bold"></span></div>
+                    <div class="mb-2 text-sm text-neutral-300">Plataforma: <span id="platform-name-display" class="font-bold text-neutral-200"></span></div>
+                    <form id="transaction-form">
+                        <div class="mb-4">
+                            <label for="transaction-amount" class="block text-sm font-medium text-neutral-300">Valor (R$)</label>
+                            <input type="number" step="0.01" id="transaction-amount" placeholder="0.00" class="mt-1 block w-full rounded-md border-zinc-600 bg-zinc-800 text-neutral-200 p-2 shadow-sm" required>
+                        </div>
+                        <input type="hidden" id="current-platform-id">
+                        <div class="flex gap-4 justify-end">
+                            <button type="submit" id="btn-add-balance" class="bg-gray-700 text-xs hover:bg-gray-600 transition-colors duration-200 px-2 py-1 rounded-lg font-medium shadow-md flex items-center gap-1">
+                                <i class="fa-solid fa-plus text-green-400"></i> Adicionar Saldo
+                            </button>
+                            <button type="submit" id="btn-withdraw-balance" class="bg-gray-700 text-xs hover:bg-gray-600 transition-colors duration-200 px-2 py-1 rounded-lg font-medium shadow-md flex items-center gap-1">
+                                <i class="fa-solid fa-minus text-red-400"></i> Retirar Saldo
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-    </div>
-
-    <div id="loading-spinner" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="flex flex-col items-center">
-            <div class="lds-dual-ring mb-4"></div>
-            <p class="text-white text-lg">Carregando...</p>
         </div>
     </div>
-    
+
+    <div id="tab-ganhos" class="tab-content">
+        <div class="bg-zinc-800 p-6 rounded-2xl shadow-inner mb-8">
+            <h2 class="text-xl font-bold mb-4 text-white text-center">Levantamento de Ganhos</h2>
+            <div id="profit-analysis-container" class="space-y-6">
+                <div id="daily-profits-section">
+                    <h3 class="text-lg font-semibold text-neutral-200 mb-2">Ganhos Diários</h3>
+                    <ul id="daily-list" class="space-y-2"></ul>
+                </div>
+                <div id="monthly-profits-section">
+                    <h3 class="text-lg font-semibold text-neutral-200 mb-2">Ganhos Mensais</h3>
+                    <ul id="monthly-list" class="space-y-2"></ul>
+                </div>
+                <div id="annual-profits-section">
+                    <h3 class="text-lg font-semibold text-neutral-200 mb-2">Ganhos Anuais</h3>
+                    <ul id="annual-list" class="space-y-2"></ul>
+                </div>
+            </div>
+            <p id="no-profit-data" class="text-neutral-400 text-sm text-center mt-4 hidden">Nenhum dado de aposta para exibir.</p>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -232,7 +398,7 @@
 
     // Elementos da UI
     const authContainer = document.getElementById('auth-container');
-    const mainContent = document.getElementById('main-content');
+    const mainContent = document.querySelector('.container.mx-auto');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const loginButton = document.getElementById('login-button');
@@ -240,16 +406,16 @@
     const signOutButton = document.getElementById('sign-out-btn');
     const betsTableBody = document.getElementById('bets-table-body');
     const historyTableBody = document.getElementById('history-table-body');
-    const betsTabBtn = document.querySelector('[data-tab="bets"]');
-    const historyTabBtn = document.querySelector('[data-tab="history"]');
-    const freebetsTabBtn = document.querySelector('[data-tab="freebets"]');
-    const peopleTabBtn = document.querySelector('[data-tab="people"]');
-    const withdrawalsTabBtn = document.querySelector('[data-tab="withdrawals"]');
+    const betsTabBtn = document.querySelector('#btn-tab-gerenciador');
+    const historyTabBtn = document.querySelector('#btn-tab-historico');
+    const freebetsTabBtn = document.querySelector('#btn-tab-freebets');
+    const peopleTabBtn = document.querySelector('#btn-tab-pessoas');
+    const withdrawalsTabBtn = document.querySelector('#btn-tab-ganhos');
 
     // Funções de Utilitário
     const formatCurrency = (amount) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
 
-    // Funções para renderização (certifique-se de que não há duplicatas em seu arquivo)
+    // Funções para renderização (agora sem duplicações)
     const renderBets = (betsToRender) => {
         betsTableBody.innerHTML = '';
         betsToRender.forEach(bet => {
@@ -372,19 +538,21 @@
     };
 
     // Listener para as tabs
-    document.querySelectorAll('.tab-btn').forEach(button => {
+    document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
-            const tab = button.dataset.tab;
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-white');
+                btn.classList.add('text-neutral-400');
+            });
+            button.classList.add('active', 'text-white');
+            button.classList.remove('text-neutral-400');
+            
             document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
+                content.style.display = 'none';
             });
-            document.getElementById(`${tab}-tab`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-zinc-700', 'text-white');
-                btn.classList.add('bg-zinc-800', 'text-neutral-400');
-            });
-            button.classList.remove('bg-zinc-800', 'text-neutral-400');
-            button.classList.add('bg-zinc-700', 'text-white');
+            
+            const targetId = button.id.replace('btn-tab-', 'tab-');
+            document.getElementById(targetId).style.display = 'block';
         });
     });
 
@@ -404,16 +572,17 @@
             // Este listener DEVE estar aqui, após o 'auth' ser inicializado
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    authContainer.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    signOutButton.classList.remove('hidden');
+                    authContainer.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    signOutButton.style.display = 'block';
                     loadBets();
                     loadPeople();
                     loadFreebets();
+                    updateAll();
                 } else {
-                    authContainer.classList.remove('hidden');
-                    mainContent.classList.add('hidden');
-                    signOutButton.classList.add('hidden');
+                    authContainer.style.display = 'block';
+                    mainContent.style.display = 'none';
+                    signOutButton.style.display = 'none';
                 }
             });
 
@@ -459,365 +628,6 @@
     // Chama a função principal para iniciar tudo
     initializeAndSetupApp();
 
-    const renderFreebets = (freebetsToRender) => {
-        const freebetsTableBody = document.getElementById('freebets-table-body');
-        if (!freebetsTableBody) return;
-        freebetsTableBody.innerHTML = '';
-        freebetsToRender.forEach(fb => {
-            const row = document.createElement('tr');
-            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
-            row.innerHTML = `
-                <td class="px-4 py-2 text-sm text-neutral-400">${fb.personName}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${fb.platformName}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(fb.stake)}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${fb.received === 'sim' ? 'Sim' : 'Não'}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${fb.expirationDate || 'N/A'}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                    <button class="delete-freebet-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300" data-id="${fb.id}">
-                        <i class="fas fa-trash-alt"></i> Deletar
-                    </button>
-                </td>
-            `;
-            freebetsTableBody.appendChild(row);
-        });
-    };
-
-    const renderPeople = (peopleToRender) => {
-        if (!peopleTableBody) return;
-        peopleTableBody.innerHTML = '';
-        peopleToRender.forEach(p => {
-            const row = document.createElement('tr');
-            row.className = 'border-b border-zinc-700 hover:bg-zinc-700 cursor-pointer';
-            row.innerHTML = `
-                <td class="px-4 py-2 text-sm text-neutral-400">${p.name}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(p.totalBalance)}</td>
-                <td class="px-4 py-2 text-right whitespace-nowrap text-sm font-medium">
-                    <button class="view-platforms-btn bg-neutral-800 text-white px-2 py-1 rounded-md text-xs hover:bg-neutral-700 transition duration-300" data-id="${p.id}">
-                        <i class="fas fa-eye"></i> Ver Plataformas
-                    </button>
-                    <button class="delete-person-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${p.id}">
-                        <i class="fas fa-trash-alt"></i> Deletar
-                    </button>
-                </td>
-            `;
-            peopleTableBody.appendChild(row);
-        });
-        document.querySelectorAll('.view-platforms-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const personId = e.target.closest('button').getAttribute('data-id');
-                currentPersonId = personId;
-                const person = people.find(p => p.id === personId);
-                document.getElementById('current-person-name').textContent = `Plataformas de ${person.name}`;
-                renderPlatforms(person.platforms);
-                document.getElementById('people-list-view').style.display = 'none';
-                document.getElementById('platforms-management-view').style.display = 'block';
-            });
-        });
-    };
-
-    const renderPlatforms = (platforms) => {
-        if (!platformsTableBody) return;
-        platformsTableBody.innerHTML = '';
-        platforms.forEach(platform => {
-            const row = document.createElement('tr');
-            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
-            row.innerHTML = `
-                <td class="px-4 py-2 text-sm text-neutral-400">${platform.name}</td>
-                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(platform.balance)}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-right">
-                    <button class="edit-platform-btn bg-yellow-500 text-white px-2 py-1 rounded-md text-xs hover:bg-yellow-600 transition duration-300" data-id="${platform.id}">
-                        <i class="fas fa-edit"></i> Ajustar Saldo
-                    </button>
-                    <button class="delete-platform-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${platform.id}">
-                        <i class="fas fa-trash-alt"></i> Deletar Plataforma
-                    </button>
-                </td>
-            `;
-            platformsTableBody.appendChild(row);
-        });
-    };
-
-
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                authContainer.style.display = 'none';
-                mainContent.style.display = 'block';
-                signOutButton.classList.remove('hidden');
-                console.log("Usuário logado:", user.email);
-                loadBets();
-                loadPeople();
-                loadFreebets();
-                updateAll();
-            } else {
-                authContainer.style.display = 'block';
-                mainContent.style.display = 'none';
-                signOutButton.classList.add('hidden');
-                console.log("Nenhum usuário logado.");
-            }
-        });
-
-        registerButton.addEventListener('click', () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert('Cadastro realizado com sucesso! Pode entrar.');
-                })
-                .catch((error) => {
-                    alert('Erro ao cadastrar: ' + error.message);
-                });
-        });
-
-        loginButton.addEventListener('click', () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert('Login realizado com sucesso!');
-                })
-                .catch((error) => {
-                    alert('Erro ao fazer login: ' + error.message);
-                });
-        });
-
-        signOutButton.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                alert('Você saiu da sua conta.');
-            }).catch((error) => {
-                alert('Erro ao sair: ' + error.message);
-            });
-        });
-
-        // Adiciona a lógica dos botões de editar e deletar
-        if (platformsTableBody) {
-            platformsTableBody.addEventListener('click', async (e) => {
-                const target = e.target;
-                const isDeleteButton = target.closest('.delete-platform-btn');
-                const isEditButton = target.closest('.edit-platform-btn');
-
-                if (isDeleteButton) {
-                    const platformId = isDeleteButton.getAttribute('data-id');
-                    if (confirm('Tem certeza que deseja deletar esta plataforma?')) {
-                        try {
-                            const docRef = doc(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`, platformId);
-                            await deleteDoc(docRef);
-                            alert('Plataforma deletada com sucesso!');
-                            await loadPeople();
-                            const person = people.find(p => p.id === currentPersonId);
-                            renderPlatforms(person.platforms);
-                        } catch (e) {
-                            console.error("Erro ao remover documento: ", e);
-                            alert('Erro ao deletar plataforma. Tente novamente.');
-                        }
-                    }
-                }
-
-                if (isEditButton) {
-                    const platformId = isEditButton.getAttribute('data-id');
-                    const platformDoc = people.find(p => p.id === currentPersonId)
-                        .platforms.find(pl => pl.id === platformId);
-
-                    if (platformDoc) {
-                        document.getElementById('current-platform-balance').textContent = formatCurrency(platformDoc.balance);
-                        document.getElementById('platform-name-display').textContent = platformDoc.name;
-                        document.getElementById('current-platform-id').value = platformId;
-                        transactionFormContainer.style.display = 'block';
-                    }
-                }
-            });
-        }
-        
-        // ... (outros listeners de botões e formulários)
-        
-        // Listener para o formulário de transação de saldo
-        if (transactionForm) {
-            transactionForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const platformId = document.getElementById('current-platform-id').value;
-                const transactionType = transactionTypeSelect.value;
-                const transactionAmount = parseFloat(transactionAmountInput.value);
-
-                if (isNaN(transactionAmount) || transactionAmount <= 0) {
-                    alert('Por favor, insira um valor válido.');
-                    return;
-                }
-
-                const person = people.find(p => p.id === currentPersonId);
-                const platformDoc = person.platforms.find(p => p.id === platformId);
-                
-                let newBalance;
-                if (transactionType === 'deposit') {
-                    newBalance = (platformDoc.balance || 0) + transactionAmount;
-                } else {
-                    newBalance = (platformDoc.balance || 0) - transactionAmount;
-                }
-
-                try {
-                    const docRef = doc(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`, platformId);
-                    await updateDoc(docRef, { balance: newBalance });
-                    alert('Saldo atualizado com sucesso!');
-                    transactionFormContainer.style.display = 'none';
-                    transactionAmountInput.value = '';
-                    await loadPeople();
-                    const updatedPerson = people.find(p => p.id === currentPersonId);
-                    if (updatedPerson) {
-                        renderPlatforms(updatedPerson.platforms);
-                    }
-                } catch (e) {
-                    console.error("Erro ao atualizar saldo: ", e);
-                    alert('Erro ao atualizar saldo. Tente novamente.');
-                }
-            });
-        }
-    
-        if (cancelTransactionBtn) {
-            cancelTransactionBtn.addEventListener('click', () => {
-                transactionFormContainer.style.display = 'none';
-                transactionAmountInput.value = '';
-            });
-        }
-
-        // Listener para o formulário de adicionar pessoa
-        const personForm = document.getElementById('person-form');
-        if (personForm) {
-            personForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const personName = document.getElementById('person-name').value;
-                try {
-                    await addDoc(collection(db, `users/${auth.currentUser.uid}/people`), {
-                        name: personName,
-                    });
-                    document.getElementById('person-name').value = '';
-                    alert('Pessoa adicionada com sucesso!');
-                    loadPeople();
-                } catch (e) {
-                    console.error("Erro ao adicionar pessoa: ", e);
-                    alert('Erro ao adicionar pessoa. Tente novamente.');
-                }
-            });
-        }
-
-        // Listeners para a tabela de pessoas (deletar)
-        if (peopleTableBody) {
-            peopleTableBody.addEventListener('click', async (e) => {
-                const target = e.target;
-                const isDeleteButton = target.closest('.delete-person-btn');
-                if (isDeleteButton) {
-                    const personId = isDeleteButton.getAttribute('data-id');
-                    if (confirm('Tem certeza que deseja deletar esta pessoa? Isso também removerá suas plataformas e apostas.')) {
-                        try {
-                            const personDocRef = doc(db, `users/${auth.currentUser.uid}/people`, personId);
-                            // Deleta todas as subcoleções (plataformas e apostas) antes de deletar a pessoa
-                            const platformsSnapshot = await getDocs(collection(personDocRef, 'platforms'));
-                            const deletePlatformsPromises = platformsSnapshot.docs.map(platDoc => deleteDoc(platDoc.ref));
-                            await Promise.all(deletePlatformsPromises);
-                            await deleteDoc(personDocRef);
-                            alert('Pessoa deletada com sucesso!');
-                            loadPeople();
-                        } catch (e) {
-                            console.error("Erro ao deletar pessoa: ", e);
-                            alert('Erro ao deletar pessoa. Tente novamente.');
-                        }
-                    }
-                }
-            });
-        }
-
-        // Listener para o formulário de adicionar plataforma
-        if (addPlatformForm) {
-            addPlatformForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const platformName = platformNameInput.value;
-                const currentPersonDoc = people.find(p => p.id === currentPersonId);
-                if (currentPersonDoc) {
-                    try {
-                        const newPlatformRef = await addDoc(collection(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`), {
-                            name: platformName,
-                            balance: 0,
-                        });
-                        alert('Plataforma adicionada com sucesso!');
-                        platformNameInput.value = '';
-                        await loadPeople();
-                        const updatedPerson = people.find(p => p.id === currentPersonId);
-                        renderPlatforms(updatedPerson.platforms);
-                    } catch (e) {
-                        console.error("Erro ao adicionar plataforma: ", e);
-                        alert('Erro ao adicionar plataforma. Tente novamente.');
-                    }
-                }
-            });
-        }
-
-        if (backToPeopleButton) {
-            backToPeopleButton.addEventListener('click', () => {
-                document.getElementById('platforms-management-view').style.display = 'none';
-                document.getElementById('people-list-view').style.display = 'block';
-                loadPeople();
-            });
-        }
-    });
-
-    const addBetForm = document.getElementById('bet-form');
-    const personSelect = document.getElementById('person');
-    const platformSelect = document.getElementById('platform');
-
-    addBetForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const date = document.getElementById('date').value;
-        const description = document.getElementById('description').value;
-        const personId = personSelect.value;
-        const platformId = platformSelect.value;
-        const type = document.getElementById('type').value;
-        const stake = parseFloat(document.getElementById('stake').value);
-        const odds = parseFloat(document.getElementById('odds').value);
-        const result = document.getElementById('result').value;
-
-        let profit = 0;
-        let retorno = 0;
-        if (result === 'Green') {
-            retorno = stake * odds;
-            profit = retorno - stake;
-        } else if (result === 'Half Green') {
-            retorno = (stake * odds) / 2 + stake / 2;
-            profit = retorno - stake;
-        } else if (result === 'Red') {
-            profit = -stake;
-        } else if (result === 'Half Red') {
-            profit = -stake / 2;
-        } else if (result === 'Void') {
-            profit = 0;
-            retorno = stake;
-        }
-
-        const person = people.find(p => p.id === personId);
-        const platform = person.platforms.find(p => p.id === platformId);
-
-        try {
-            await addDoc(collection(db, `users/${auth.currentUser.uid}/bets`), {
-                date,
-                description,
-                personId,
-                personName: person.name,
-                platformId,
-                platformName: platform.name,
-                type,
-                stake,
-                odds,
-                result,
-                return: retorno,
-                profit,
-            });
-            alert('Aposta adicionada com sucesso!');
-            addBetForm.reset();
-            loadBets();
-        } catch (e) {
-            console.error("Erro ao adicionar documento: ", e);
-            alert('Erro ao adicionar aposta. Tente novamente.');
-        }
-    });
 </script>
-
 </body>
 </html>
