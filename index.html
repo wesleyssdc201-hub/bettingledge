@@ -252,7 +252,17 @@
     let freebets = [];
     let currentPersonId = null;
 
-    // Novo listener para as tabs (mantido do código original)
+    [cite_start]// CONFIGURAÇÃO DO FIREBASE (INSERIDA DIRETAMENTE) [cite: 1]
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
+      authDomain: "betting-ledger-558f2.firebaseapp.com",
+      projectId: "betting-ledger-558f2",
+      storageBucket: "betting-ledger-558f2.firebasestorage.app",
+      messagingSenderId: "68773956884",
+      appId: "1:68773956884:web:1bd90aba9cefede5c88601"
+    };
+
+    // Novo listener para as tabs
     document.querySelectorAll('.tab-btn').forEach(button => {
         button.addEventListener('click', () => {
             const tab = button.dataset.tab;
@@ -270,128 +280,115 @@
     });
 
     // Função para inicializar o Firebase e adicionar os event listeners de login
-    async function initializeAndSetupApp() {
-        try {
-            const response = await fetch('/api/config.js');
-            if (!response.ok) {
-                throw new Error('Erro ao carregar a configuração do Firebase.');
+    function initializeAndSetupApp() {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        
+        // Listener de estado de autenticação
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authContainer.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                signOutButton.classList.remove('hidden');
+                loadBets();
+                loadPeople();
+                loadFreebets();
+            } else {
+                authContainer.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+                signOutButton.classList.add('hidden');
             }
-            const firebaseConfig = await response.json();
-            
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            
-            // Listener de estado de autenticação
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    authContainer.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    signOutButton.classList.remove('hidden');
+        });
+
+        // Adiciona os listeners APÓS a inicialização do Firebase
+        registerButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Cadastro realizado com sucesso! Pode entrar.');
+                })
+                .catch((error) => {
+                    alert('Erro ao cadastrar: ' + error.message);
+                });
+        });
+
+        loginButton.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Login realizado com sucesso!');
+                })
+                .catch((error) => {
+                    alert('Erro ao fazer login: ' + error.message);
+                });
+        });
+        
+        signOutButton.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                alert('Você saiu da sua conta.');
+            }).catch((error) => {
+                alert('Erro ao sair: ' + error.message);
+            });
+        });
+
+        // Se você quiser o formulário de aposta funcionando, o listener precisa estar aqui
+        const betForm = document.getElementById('bet-form');
+        if(betForm) {
+            betForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // ... (resto do seu código do formulário de aposta) ...
+                const date = document.getElementById('date').value;
+                const description = document.getElementById('description').value;
+                const personId = personSelect.value;
+                const platformId = platformSelect.value;
+                const type = document.getElementById('type').value;
+                const stake = parseFloat(document.getElementById('stake').value);
+                const odds = parseFloat(document.getElementById('odds').value);
+                const result = document.getElementById('result').value;
+
+                let profit = 0;
+                let retorno = 0;
+                if (result === 'Green') {
+                    retorno = stake * odds;
+                    profit = retorno - stake;
+                } else if (result === 'Half Green') {
+                    retorno = (stake * odds) / 2 + stake / 2;
+                    profit = retorno - stake;
+                } else if (result === 'Red') {
+                    profit = -stake;
+                } else if (result === 'Half Red') {
+                    profit = -stake / 2;
+                } else if (result === 'Void') {
+                    profit = 0;
+                    retorno = stake;
+                }
+
+                try {
+                    await addDoc(collection(db, `users/${auth.currentUser.uid}/bets`), {
+                        date,
+                        description,
+                        personId,
+                        personName: 'Nome da Pessoa', // Aqui precisa ser corrigido para a pessoa real
+                        platformId,
+                        platformName: 'Nome da Plataforma', // Aqui precisa ser corrigido para a plataforma real
+                        type,
+                        stake,
+                        odds,
+                        result,
+                        return: retorno,
+                        profit,
+                    });
+                    alert('Aposta adicionada com sucesso!');
+                    betForm.reset();
                     loadBets();
-                    loadPeople();
-                    loadFreebets();
-                } else {
-                    authContainer.classList.remove('hidden');
-                    mainContent.classList.add('hidden');
-                    signOutButton.classList.add('hidden');
+                } catch (e) {
+                    console.error("Erro ao adicionar documento: ", e);
+                    alert('Erro ao adicionar aposta. Tente novamente.');
                 }
             });
-
-            // Adiciona os listeners APÓS a inicialização do Firebase
-            registerButton.addEventListener('click', () => {
-                const email = emailInput.value;
-                const password = passwordInput.value;
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        alert('Cadastro realizado com sucesso! Pode entrar.');
-                    })
-                    .catch((error) => {
-                        alert('Erro ao cadastrar: ' + error.message);
-                    });
-            });
-
-            loginButton.addEventListener('click', () => {
-                const email = emailInput.value;
-                const password = passwordInput.value;
-                signInWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        alert('Login realizado com sucesso!');
-                    })
-                    .catch((error) => {
-                        alert('Erro ao fazer login: ' + error.message);
-                    });
-            });
-            
-            signOutButton.addEventListener('click', () => {
-                signOut(auth).then(() => {
-                    alert('Você saiu da sua conta.');
-                }).catch((error) => {
-                    alert('Erro ao sair: ' + error.message);
-                });
-            });
-
-            // Se você quiser o formulário de aposta funcionando, o listener precisa estar aqui
-            const betForm = document.getElementById('bet-form');
-            if(betForm) {
-                betForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    // ... (resto do seu código do formulário de aposta) ...
-                    const date = document.getElementById('date').value;
-                    const description = document.getElementById('description').value;
-                    const personId = personSelect.value;
-                    const platformId = platformSelect.value;
-                    const type = document.getElementById('type').value;
-                    const stake = parseFloat(document.getElementById('stake').value);
-                    const odds = parseFloat(document.getElementById('odds').value);
-                    const result = document.getElementById('result').value;
-
-                    let profit = 0;
-                    let retorno = 0;
-                    if (result === 'Green') {
-                        retorno = stake * odds;
-                        profit = retorno - stake;
-                    } else if (result === 'Half Green') {
-                        retorno = (stake * odds) / 2 + stake / 2;
-                        profit = retorno - stake;
-                    } else if (result === 'Red') {
-                        profit = -stake;
-                    } else if (result === 'Half Red') {
-                        profit = -stake / 2;
-                    } else if (result === 'Void') {
-                        profit = 0;
-                        retorno = stake;
-                    }
-
-                    try {
-                        await addDoc(collection(db, `users/${auth.currentUser.uid}/bets`), {
-                            date,
-                            description,
-                            personId,
-                            personName: 'Nome da Pessoa', // Aqui precisa ser corrigido para a pessoa real
-                            platformId,
-                            platformName: 'Nome da Plataforma', // Aqui precisa ser corrigido para a plataforma real
-                            type,
-                            stake,
-                            odds,
-                            result,
-                            return: retorno,
-                            profit,
-                        });
-                        alert('Aposta adicionada com sucesso!');
-                        betForm.reset();
-                        loadBets();
-                    } catch (e) {
-                        console.error("Erro ao adicionar documento: ", e);
-                        alert('Erro ao adicionar aposta. Tente novamente.');
-                    }
-                });
-            }
-
-
-        } catch (error) {
-            console.error("Erro ao carregar a configuração do Firebase:", error);
-            alert("Erro ao carregar a aplicação. Por favor, tente novamente mais tarde.");
         }
     }
 
@@ -613,6 +610,11 @@
         updateROI();
     };
 
+    // Funções utilitárias
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    };
+
     // Event Listeners
     const personSelect = document.getElementById('person');
     const platformSelect = document.getElementById('platform');
@@ -665,8 +667,6 @@
             }
         });
     }
-    
-    // ... (outros listeners de botões e formulários)
     
     // Listener para o formulário de transação de saldo
     if (transactionForm) {
