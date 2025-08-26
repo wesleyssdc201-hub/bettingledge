@@ -92,7 +92,7 @@
         </nav>
 
         <div id="bets-tab" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4 text-white">Apostas Abertas</h2>
+            <h2 class="text-2xl font-bold mb-4 text-white">Adicionar Nova Aposta</h2>
             <div class="bg-zinc-800 p-6 rounded-lg shadow-md">
                 <form id="bet-form" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -142,7 +142,7 @@
                 </form>
             </div>
             <div class="mt-8 overflow-x-auto">
-                <h3 class="text-xl font-bold mb-4 text-white">Lista de Apostas</h3>
+                <h3 class="text-xl font-bold mb-4 text-white">Lista de Apostas Abertas</h3>
                 <table class="w-full text-left table-auto">
                     <thead>
                         <tr class="bg-zinc-700">
@@ -191,26 +191,157 @@
         </div>
 
         <div id="freebets-tab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-white">Freebets</h2>
+            <h2 class="text-2xl font-bold mb-4 text-white">Gerenciar Freebets</h2>
+            <div class="bg-zinc-800 p-6 rounded-lg shadow-md">
+                <form id="freebet-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label for="fb-person" class="block text-sm font-medium text-neutral-400 mb-1">Pessoa</label>
+                            <select id="fb-person" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        </div>
+                        <div>
+                            <label for="fb-platform" class="block text-sm font-medium text-neutral-400 mb-1">Plataforma</label>
+                            <select id="fb-platform" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        </div>
+                        <div>
+                            <label for="fb-stake" class="block text-sm font-medium text-neutral-400 mb-1">Valor da Freebet</label>
+                            <input type="number" step="0.01" id="fb-stake" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="fb-received" class="block text-sm font-medium text-neutral-400 mb-1">Recebida?</label>
+                            <select id="fb-received" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="sim">Sim</option>
+                                <option value="nao">Não</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="fb-expiration-date" class="block text-sm font-medium text-neutral-400 mb-1">Data de Expiração</label>
+                            <input type="date" id="fb-expiration-date" class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition duration-300">
+                        Adicionar Freebet
+                    </button>
+                </form>
             </div>
+            <div class="mt-8 overflow-x-auto">
+                <h3 class="text-xl font-bold mb-4 text-white">Lista de Freebets</h3>
+                <table class="w-full text-left table-auto">
+                    <thead>
+                        <tr class="bg-zinc-700">
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Pessoa</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Plataforma</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Valor</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Recebida</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Data de Expiração</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="freebets-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <div id="people-tab" class="tab-content hidden">
             <div id="people-list-view">
-                <h2 class="text-2xl font-bold mb-4 text-white">Pessoas & Plataformas</h2>
+                <h2 class="text-2xl font-bold mb-4 text-white">Gerenciar Pessoas</h2>
+                <div class="bg-zinc-800 p-6 rounded-lg shadow-md mb-8">
+                    <form id="person-form" class="flex gap-4">
+                        <input type="text" id="person-name" placeholder="Nome da Pessoa" required class="flex-grow px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition duration-300">
+                            Adicionar Pessoa
+                        </button>
+                    </form>
                 </div>
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-bold mb-4 text-white">Lista de Pessoas</h3>
+                    <table class="w-full text-left table-auto">
+                        <thead>
+                            <tr class="bg-zinc-700">
+                                <th class="px-4 py-2 text-sm font-medium text-neutral-400">Pessoa</th>
+                                <th class="px-4 py-2 text-sm font-medium text-neutral-400">Saldo Total</th>
+                                <th class="px-4 py-2 text-sm font-medium text-neutral-400 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="people-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div id="platforms-management-view" class="hidden">
                 <button id="back-to-people-btn" class="bg-zinc-600 text-white px-4 py-2 rounded-md font-semibold mb-4 hover:bg-zinc-700 transition duration-300">
                     <i class="fas fa-arrow-left"></i> Voltar para Pessoas
                 </button>
                 <div class="mb-4">
-                    <h3 class="text-xl font-bold text-white mb-2">Plataformas de <span id="current-person-name"></span></h3>
+                    <h3 class="text-xl font-bold text-white mb-2">Plataformas de <span id="current-person-name" class="font-normal text-neutral-300"></span></h3>
                 </div>
+                <div class="bg-zinc-800 p-6 rounded-lg shadow-md mb-8">
+                    <form id="add-platform-form" class="flex gap-4">
+                        <input type="text" id="platform-name" placeholder="Nome da Plataforma" required class="flex-grow px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition duration-300">
+                            Adicionar Plataforma
+                        </button>
+                    </form>
                 </div>
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-bold mb-4 text-white">Lista de Plataformas</h3>
+                    <table class="w-full text-left table-auto">
+                        <thead>
+                            <tr class="bg-zinc-700">
+                                <th class="px-4 py-2 text-sm font-medium text-neutral-400">Plataforma</th>
+                                <th class="px-4 py-2 text-sm font-medium text-neutral-400">Saldo</th>
+                                <th class="px-4 py-2 text-sm font-medium text-neutral-400 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="platforms-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <div id="withdrawals-tab" class="tab-content hidden">
             <h2 class="text-2xl font-bold mb-4 text-white">Levantamento de Ganhos</h2>
+            <div class="bg-zinc-800 p-6 rounded-lg shadow-md">
+                <form id="withdrawal-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label for="withdrawal-person" class="block text-sm font-medium text-neutral-400 mb-1">Pessoa</label>
+                            <select id="withdrawal-person" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        </div>
+                        <div>
+                            <label for="withdrawal-platform" class="block text-sm font-medium text-neutral-400 mb-1">Plataforma</label>
+                            <select id="withdrawal-platform" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        </div>
+                        <div>
+                            <label for="withdrawal-amount" class="block text-sm font-medium text-neutral-400 mb-1">Valor do Levantamento</label>
+                            <input type="number" step="0.01" id="withdrawal-amount" required class="w-full px-3 py-2 bg-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition duration-300">
+                        Registrar Levantamento
+                    </button>
+                </form>
             </div>
+            <div class="mt-8 overflow-x-auto">
+                <h3 class="text-xl font-bold mb-4 text-white">Histórico de Levantamentos</h3>
+                <table class="w-full text-left table-auto">
+                    <thead>
+                        <tr class="bg-zinc-700">
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Pessoa</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Plataforma</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Valor</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Data</th>
+                            <th class="px-4 py-2 text-sm font-medium text-neutral-400">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawals-table-body" class="bg-zinc-800 divide-y divide-zinc-700">
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
@@ -238,21 +369,14 @@
     const loginButton = document.getElementById('login-button');
     const registerButton = document.getElementById('register-button');
     const signOutButton = document.getElementById('sign-out-btn');
-    const betsTableBody = document.getElementById('bets-table-body');
-    const historyTableBody = document.getElementById('history-table-body');
-    const betsTabBtn = document.querySelector('[data-tab="bets"]');
-    const historyTabBtn = document.querySelector('[data-tab="history"]');
-    const freebetsTabBtn = document.querySelector('[data-tab="freebets"]');
-    const peopleTabBtn = document.querySelector('[data-tab="people"]');
-    const withdrawalsTabBtn = document.querySelector('[data-tab="withdrawals"]');
 
     // Variáveis Globais de Dados
     let people = [];
     let bets = [];
     let freebets = [];
-    let currentPersonId = null;
+    let withdrawals = [];
 
-    // CONFIGURAÇÃO DO FIREBASE (INSERIDA DIRETAMENTE)
+    // CONFIGURAÇÃO DO FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyCCA2C8c4HFx7VY6s7bh_a5n_f3O2Ogm7Y",
       authDomain: "betting-ledger-558f2.firebaseapp.com",
@@ -262,38 +386,18 @@
       appId: "1:68773956884:web:1bd90aba9cefede5c88601"
     };
 
-    // Novo listener para as tabs
-    document.querySelectorAll('.tab-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const tab = button.dataset.tab;
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            document.getElementById(`${tab}-tab`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-zinc-700', 'text-white');
-                btn.classList.add('bg-zinc-800', 'text-neutral-400');
-            });
-            button.classList.remove('bg-zinc-800', 'text-neutral-400');
-            button.classList.add('bg-zinc-700', 'text-white');
-        });
-    });
-
     // Função para inicializar o Firebase e adicionar os event listeners de login
     function initializeAndSetupApp() {
         const app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
         
-        // Listener de estado de autenticação
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 authContainer.classList.add('hidden');
                 mainContent.classList.remove('hidden');
                 signOutButton.classList.remove('hidden');
-                loadBets();
-                loadPeople();
-                loadFreebets();
+                loadAllData();
             } else {
                 authContainer.classList.remove('hidden');
                 mainContent.classList.add('hidden');
@@ -301,95 +405,76 @@
             }
         });
 
-        // Adiciona os listeners APÓS a inicialização do Firebase
         registerButton.addEventListener('click', () => {
             const email = emailInput.value;
             const password = passwordInput.value;
             createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert('Cadastro realizado com sucesso! Pode entrar.');
-                })
-                .catch((error) => {
-                    alert('Erro ao cadastrar: ' + error.message);
-                });
+                .then(() => { alert('Cadastro realizado com sucesso! Pode entrar.'); })
+                .catch((error) => { alert('Erro ao cadastrar: ' + error.message); });
         });
 
         loginButton.addEventListener('click', () => {
             const email = emailInput.value;
             const password = passwordInput.value;
             signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert('Login realizado com sucesso!');
-                })
-                .catch((error) => {
-                    alert('Erro ao fazer login: ' + error.message);
-                });
+                .then(() => { alert('Login realizado com sucesso!'); })
+                .catch((error) => { alert('Erro ao fazer login: ' + error.message); });
         });
         
         signOutButton.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                alert('Você saiu da sua conta.');
-            }).catch((error) => {
-                alert('Erro ao sair: ' + error.message);
-            });
+            signOut(auth).then(() => { alert('Você saiu da sua conta.'); }).catch((error) => { alert('Erro ao sair: ' + error.message); });
         });
-
-        // Se você quiser o formulário de aposta funcionando, o listener precisa estar aqui
-        const betForm = document.getElementById('bet-form');
-        if(betForm) {
-            betForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const date = document.getElementById('date').value;
-                const description = document.getElementById('description').value;
-                const personId = personSelect.value;
-                const platformId = platformSelect.value;
-                const type = document.getElementById('type').value;
-                const stake = parseFloat(document.getElementById('stake').value);
-                const odds = parseFloat(document.getElementById('odds').value);
-                const result = document.getElementById('result').value;
-
-                let profit = 0;
-                let retorno = 0;
-                if (result === 'Green') {
-                    retorno = stake * odds;
-                    profit = retorno - stake;
-                } else if (result === 'Half Green') {
-                    retorno = (stake * odds) / 2 + stake / 2;
-                    profit = retorno - stake;
-                } else if (result === 'Red') {
-                    profit = -stake;
-                } else if (result === 'Half Red') {
-                    profit = -stake / 2;
-                } else if (result === 'Void') {
-                    profit = 0;
-                    retorno = stake;
-                }
-
-                try {
-                    await addDoc(collection(db, `users/${auth.currentUser.uid}/bets`), {
-                        date,
-                        description,
-                        personId,
-                        personName: 'Nome da Pessoa',
-                        platformId,
-                        platformName: 'Nome da Plataforma',
-                        type,
-                        stake,
-                        odds,
-                        result,
-                        return: retorno,
-                        profit,
-                    });
-                    alert('Aposta adicionada com sucesso!');
-                    betForm.reset();
-                    loadBets();
-                } catch (e) {
-                    console.error("Erro ao adicionar documento: ", e);
-                    alert('Erro ao adicionar aposta. Tente novamente.');
-                }
-            });
-        }
     }
+
+    // Carregar todos os dados do Firestore
+    const loadAllData = async () => {
+        showLoading();
+        await Promise.all([
+            loadPeople(),
+            loadBets(),
+            loadFreebets(),
+            loadWithdrawals()
+        ]);
+        updateAll();
+        hideLoading();
+    };
+
+    const loadPeople = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people`));
+        people = await Promise.all(querySnapshot.docs.map(async doc => {
+            const platformsSnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people/${doc.id}/platforms`));
+            const platforms = platformsSnapshot.docs.map(platDoc => ({ id: platDoc.id, ...platDoc.data() }));
+            const totalBalance = platforms.reduce((sum, p) => sum + (p.balance || 0), 0);
+            return { id: doc.id, ...doc.data(), platforms, totalBalance };
+        }));
+        renderPeople(people);
+        populatePersonSelects();
+    };
+
+    const loadBets = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/bets`));
+        bets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const openBets = bets.filter(bet => bet.result === 'Aberta');
+        const finishedBets = bets.filter(bet => bet.result !== 'Aberta');
+        renderBets(openBets);
+        renderHistory(finishedBets);
+    };
+
+    const loadFreebets = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/freebets`));
+        freebets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderFreebets(freebets);
+    };
+
+    const loadWithdrawals = async () => {
+        if (!auth.currentUser) return;
+        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/withdrawals`));
+        withdrawals = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderWithdrawals(withdrawals);
+    };
 
     // Funções de Renderização
     const renderBets = (betsToRender) => {
@@ -399,7 +484,6 @@
         betsToRender.forEach(bet => {
             const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
             const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
-
             const row = document.createElement('tr');
             row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
             row.innerHTML = `
@@ -433,7 +517,6 @@
         historyToRender.forEach(bet => {
             const resultColorClass = bet.result === 'Green' ? 'text-green-500' : bet.result === 'Red' ? 'text-red-500' : 'text-neutral-400';
             const profitColorClass = bet.profit > 0 ? 'text-green-500' : bet.profit < 0 ? 'text-red-500' : 'text-neutral-400';
-
             const row = document.createElement('tr');
             row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
             row.innerHTML = `
@@ -504,23 +587,13 @@
             `;
             peopleTableBody.appendChild(row);
         });
-        document.querySelectorAll('.view-platforms-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const personId = e.target.closest('button').getAttribute('data-id');
-                currentPersonId = personId;
-                const person = people.find(p => p.id === personId);
-                document.getElementById('current-person-name').textContent = `Plataformas de ${person.name}`;
-                renderPlatforms(person.platforms);
-                document.getElementById('people-list-view').style.display = 'none';
-                document.getElementById('platforms-management-view').style.display = 'block';
-            });
-        });
     };
 
-    const renderPlatforms = (platforms) => {
+    const renderPlatforms = (platforms, personName) => {
         const platformsTableBody = document.getElementById('platforms-table-body');
         if (!platformsTableBody) return;
         platformsTableBody.innerHTML = '';
+        document.getElementById('current-person-name').textContent = personName;
         platforms.forEach(platform => {
             const row = document.createElement('tr');
             row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
@@ -528,7 +601,7 @@
                 <td class="px-4 py-2 text-sm text-neutral-400">${platform.name}</td>
                 <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(platform.balance)}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-right">
-                    <button class="edit-platform-btn bg-yellow-500 text-white px-2 py-1 rounded-md text-xs hover:bg-yellow-600 transition duration-300" data-id="${platform.id}">
+                    <button class="edit-platform-btn bg-neutral-800 text-white px-2 py-1 rounded-md text-xs hover:bg-neutral-700 transition duration-300" data-id="${platform.id}">
                         <i class="fas fa-edit"></i> Ajustar Saldo
                     </button>
                     <button class="delete-platform-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300 ml-2" data-id="${platform.id}">
@@ -540,38 +613,42 @@
         });
     };
 
-    // Funções de Carregamento de Dados do Firestore
-    const loadBets = async () => {
-        if (!auth.currentUser) return;
-        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/bets`));
-        bets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const openBets = bets.filter(bet => bet.result === 'Aberta' || bet.result === 'Aberta FB');
-        const finishedBets = bets.filter(bet => bet.result !== 'Aberta' && bet.result !== 'Aberta FB');
-        renderBets(openBets);
-        renderHistory(finishedBets);
-        updateAll();
+    const renderWithdrawals = (withdrawalsToRender) => {
+        const withdrawalsTableBody = document.getElementById('withdrawals-table-body');
+        if (!withdrawalsTableBody) return;
+        withdrawalsTableBody.innerHTML = '';
+        withdrawalsToRender.forEach(w => {
+            const row = document.createElement('tr');
+            row.className = 'border-b border-zinc-700 hover:bg-zinc-700';
+            row.innerHTML = `
+                <td class="px-4 py-2 text-sm text-neutral-400">${w.personName}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${w.platformName}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${formatCurrency(w.amount)}</td>
+                <td class="px-4 py-2 text-sm text-neutral-400">${w.date}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                    <button class="delete-withdrawal-btn bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600 transition duration-300" data-id="${w.id}">
+                        <i class="fas fa-trash-alt"></i> Deletar
+                    </button>
+                </td>
+            `;
+            withdrawalsTableBody.appendChild(row);
+        });
     };
 
-    const loadPeople = async () => {
-        if (!auth.currentUser) return;
-        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people`));
-        people = await Promise.all(querySnapshot.docs.map(async doc => {
-            const platformsSnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/people/${doc.id}/platforms`));
-            const platforms = platformsSnapshot.docs.map(platDoc => ({ id: platDoc.id, ...platDoc.data() }));
-            const totalBalance = platforms.reduce((sum, p) => sum + (p.balance || 0), 0);
-            return { id: doc.id, ...doc.data(), platforms, totalBalance };
-        }));
-        renderPeople(people);
+    const populatePersonSelects = () => {
+        const personSelects = document.querySelectorAll('#bet-form #person, #freebet-form #fb-person, #withdrawal-form #withdrawal-person');
+        personSelects.forEach(select => {
+            select.innerHTML = '<option value="">Selecione uma Pessoa</option>';
+            people.forEach(person => {
+                const option = document.createElement('option');
+                option.value = person.id;
+                option.textContent = person.name;
+                select.appendChild(option);
+            });
+        });
     };
-
-    const loadFreebets = async () => {
-        if (!auth.currentUser) return;
-        const querySnapshot = await getDocs(collection(db, `users/${auth.currentUser.uid}/freebets`));
-        freebets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderFreebets(freebets);
-    };
-
-    // Funções de Atualização
+    
+    // Funções de atualização
     const updateBankroll = () => {
         const totalBankroll = people.reduce((sum, p) => sum + (p.totalBalance || 0), 0);
         document.getElementById('current-bankroll').textContent = formatCurrency(totalBankroll);
@@ -609,194 +686,53 @@
         updateROI();
     };
 
-    // Funções utilitárias
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
     };
 
+    const showLoading = () => {
+        document.getElementById('loading-spinner').classList.remove('hidden');
+    };
+
+    const hideLoading = () => {
+        document.getElementById('loading-spinner').classList.add('hidden');
+    };
+
     // Event Listeners
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const tab = button.dataset.tab;
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-zinc-700', 'text-white');
+                btn.classList.add('bg-zinc-800', 'text-neutral-400');
+            });
+            button.classList.remove('bg-zinc-800', 'text-neutral-400');
+            button.classList.add('bg-zinc-700', 'text-white');
+        });
+    });
+
     const personSelect = document.getElementById('person');
     const platformSelect = document.getElementById('platform');
-    const transactionFormContainer = document.getElementById('transaction-form-container');
-    const transactionForm = document.getElementById('transaction-form');
-    const transactionTypeSelect = document.getElementById('transaction-type');
-    const transactionAmountInput = document.getElementById('transaction-amount');
-    const cancelTransactionBtn = document.getElementById('cancel-transaction-btn');
-    const addPlatformForm = document.getElementById('add-platform-form');
-    const platformNameInput = document.getElementById('platform-name');
-    const peopleTableBody = document.getElementById('people-table-body');
-    const platformsTableBody = document.getElementById('platforms-table-body');
-    const backToPeopleButton = document.getElementById('back-to-people-btn');
+    personSelect.addEventListener('change', () => {
+        const selectedPersonId = personSelect.value;
+        const selectedPerson = people.find(p => p.id === selectedPersonId);
+        platformSelect.innerHTML = '<option value="">Selecione uma Plataforma</option>';
+        if (selectedPerson) {
+            selectedPerson.platforms.forEach(platform => {
+                const option = document.createElement('option');
+                option.value = platform.id;
+                option.textContent = platform.name;
+                platformSelect.appendChild(option);
+            });
+        }
+    });
 
-    // Adiciona a lógica dos botões de editar e deletar
-    if (platformsTableBody) {
-        platformsTableBody.addEventListener('click', async (e) => {
-            const target = e.target;
-            const isDeleteButton = target.closest('.delete-platform-btn');
-            const isEditButton = target.closest('.edit-platform-btn');
-
-            if (isDeleteButton) {
-                const platformId = isDeleteButton.getAttribute('data-id');
-                if (confirm('Tem certeza que deseja deletar esta plataforma?')) {
-                    try {
-                        const docRef = doc(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`, platformId);
-                        await deleteDoc(docRef);
-                        alert('Plataforma deletada com sucesso!');
-                        await loadPeople();
-                        const person = people.find(p => p.id === currentPersonId);
-                        renderPlatforms(person.platforms);
-                    } catch (e) {
-                        console.error("Erro ao remover documento: ", e);
-                        alert('Erro ao deletar plataforma. Tente novamente.');
-                    }
-                }
-            }
-
-            if (isEditButton) {
-                const platformId = isEditButton.getAttribute('data-id');
-                const platformDoc = people.find(p => p.id === currentPersonId)
-                    .platforms.find(pl => pl.id === platformId);
-
-                if (platformDoc) {
-                    document.getElementById('current-platform-balance').textContent = formatCurrency(platformDoc.balance);
-                    document.getElementById('platform-name-display').textContent = platformDoc.name;
-                    document.getElementById('current-platform-id').value = platformId;
-                    transactionFormContainer.style.display = 'block';
-                }
-            }
-        });
-    }
-    
-    // Listener para o formulário de transação de saldo
-    if (transactionForm) {
-        transactionForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const platformId = document.getElementById('current-platform-id').value;
-            const transactionType = transactionTypeSelect.value;
-            const transactionAmount = parseFloat(transactionAmountInput.value);
-
-            if (isNaN(transactionAmount) || transactionAmount <= 0) {
-                alert('Por favor, insira um valor válido.');
-                return;
-            }
-
-            const person = people.find(p => p.id === currentPersonId);
-            const platformDoc = person.platforms.find(p => p.id === platformId);
-            
-            let newBalance;
-            if (transactionType === 'deposit') {
-                newBalance = (platformDoc.balance || 0) + transactionAmount;
-            } else {
-                newBalance = (platformDoc.balance || 0) - transactionAmount;
-            }
-
-            try {
-                const docRef = doc(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`, platformId);
-                await updateDoc(docRef, { balance: newBalance });
-                alert('Saldo atualizado com sucesso!');
-                transactionFormContainer.style.display = 'none';
-                transactionAmountInput.value = '';
-                await loadPeople();
-                const updatedPerson = people.find(p => p.id === currentPersonId);
-                if (updatedPerson) {
-                    renderPlatforms(updatedPerson.platforms);
-                }
-            } catch (e) {
-                console.error("Erro ao atualizar saldo: ", e);
-                alert('Erro ao atualizar saldo. Tente novamente.');
-            }
-        });
-    }
-
-    if (cancelTransactionBtn) {
-        cancelTransactionBtn.addEventListener('click', () => {
-            transactionFormContainer.style.display = 'none';
-            transactionAmountInput.value = '';
-        });
-    }
-
-    // Listener para o formulário de adicionar pessoa
-    const personForm = document.getElementById('person-form');
-    if (personForm) {
-        personForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const personName = document.getElementById('person-name').value;
-            try {
-                await addDoc(collection(db, `users/${auth.currentUser.uid}/people`), {
-                    name: personName,
-                });
-                document.getElementById('person-name').value = '';
-                alert('Pessoa adicionada com sucesso!');
-                loadPeople();
-            } catch (e) {
-                console.error("Erro ao adicionar pessoa: ", e);
-                alert('Erro ao adicionar pessoa. Tente novamente.');
-            }
-        });
-    }
-
-    // Listeners para a tabela de pessoas (deletar)
-    if (peopleTableBody) {
-        peopleTableBody.addEventListener('click', async (e) => {
-            const target = e.target;
-            const isDeleteButton = target.closest('.delete-person-btn');
-            if (isDeleteButton) {
-                const personId = isDeleteButton.getAttribute('data-id');
-                if (confirm('Tem certeza que deseja deletar esta pessoa? Isso também removerá suas plataformas e apostas.')) {
-                    try {
-                        const personDocRef = doc(db, `users/${auth.currentUser.uid}/people`, personId);
-                        // Deleta todas as subcoleções (plataformas e apostas) antes de deletar a pessoa
-                        const platformsSnapshot = await getDocs(collection(personDocRef, 'platforms'));
-                        const deletePlatformsPromises = platformsSnapshot.docs.map(platDoc => deleteDoc(platDoc.ref));
-                        await Promise.all(deletePlatformsPromises);
-                        await deleteDoc(personDocRef);
-                        alert('Pessoa deletada com sucesso!');
-                        loadPeople();
-                    } catch (e) {
-                        console.error("Erro ao deletar pessoa: ", e);
-                        alert('Erro ao deletar pessoa. Tente novamente.');
-                    }
-                }
-            }
-        });
-    }
-
-    // Listener para o formulário de adicionar plataforma
-    if (addPlatformForm) {
-        addPlatformForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const platformName = platformNameInput.value;
-            const currentPersonDoc = people.find(p => p.id === currentPersonId);
-            if (currentPersonDoc) {
-                try {
-                    const newPlatformRef = await addDoc(collection(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`), {
-                        name: platformName,
-                        balance: 0,
-                    });
-                    alert('Plataforma adicionada com sucesso!');
-                    platformNameInput.value = '';
-                    await loadPeople();
-                    const updatedPerson = people.find(p => p.id === currentPersonId);
-                    renderPlatforms(updatedPerson.platforms);
-                } catch (e) {
-                    console.error("Erro ao adicionar plataforma: ", e);
-                    alert('Erro ao adicionar plataforma. Tente novamente.');
-                }
-            }
-        });
-    }
-
-    if (backToPeopleButton) {
-        backToPeopleButton.addEventListener('click', () => {
-            document.getElementById('platforms-management-view').style.display = 'none';
-            document.getElementById('people-list-view').style.display = 'block';
-            loadPeople();
-        });
-    }
-
-    // Adiciona a lógica do formulário de aposta
-    const addBetForm = document.getElementById('bet-form');
-    addBetForm.addEventListener('submit', async (e) => {
+    // Forms
+    document.getElementById('bet-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const date = document.getElementById('date').value;
         const description = document.getElementById('description').value;
@@ -806,6 +742,11 @@
         const stake = parseFloat(document.getElementById('stake').value);
         const odds = parseFloat(document.getElementById('odds').value);
         const result = document.getElementById('result').value;
+
+        if (!personId || !platformId) {
+            alert('Por favor, selecione uma pessoa e uma plataforma.');
+            return;
+        }
 
         let profit = 0;
         let retorno = 0;
@@ -829,29 +770,129 @@
 
         try {
             await addDoc(collection(db, `users/${auth.currentUser.uid}/bets`), {
-                date,
-                description,
-                personId,
-                personName: person.name,
-                platformId,
-                platformName: platform.name,
-                type,
-                stake,
-                odds,
-                result,
-                return: retorno,
-                profit,
+                date, description, personId, personName: person.name, platformId, platformName: platform.name,
+                type, stake, odds, result, return: retorno, profit
             });
             alert('Aposta adicionada com sucesso!');
-            addBetForm.reset();
+            document.getElementById('bet-form').reset();
             loadBets();
         } catch (e) {
-            console.error("Erro ao adicionar documento: ", e);
+            console.error("Erro ao adicionar aposta: ", e);
             alert('Erro ao adicionar aposta. Tente novamente.');
         }
     });
 
-    // Chama a função de inicialização
+    document.getElementById('person-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const personName = document.getElementById('person-name').value;
+        try {
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/people`), { name: personName, });
+            document.getElementById('person-name').value = '';
+            alert('Pessoa adicionada com sucesso!');
+            loadPeople();
+        } catch (e) {
+            console.error("Erro ao adicionar pessoa: ", e);
+            alert('Erro ao adicionar pessoa. Tente novamente.');
+        }
+    });
+    
+    document.getElementById('add-platform-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const platformName = document.getElementById('platform-name').value;
+        const currentPersonId = document.getElementById('people-table-body').getAttribute('data-current-person-id');
+        if (!currentPersonId) {
+            alert('Erro: Nenhuma pessoa selecionada.');
+            return;
+        }
+        try {
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/people/${currentPersonId}/platforms`), { name: platformName, balance: 0 });
+            document.getElementById('platform-name').value = '';
+            alert('Plataforma adicionada com sucesso!');
+            loadPeople();
+            const person = people.find(p => p.id === currentPersonId);
+            renderPlatforms(person.platforms, person.name);
+        } catch (e) {
+            console.error("Erro ao adicionar plataforma: ", e);
+            alert('Erro ao adicionar plataforma. Tente novamente.');
+        }
+    });
+    
+    // Tabela de Pessoas e Plataformas
+    const peopleTableBody = document.getElementById('people-table-body');
+    if (peopleTableBody) {
+        peopleTableBody.addEventListener('click', async (e) => {
+            const target = e.target;
+            const row = target.closest('tr');
+            const personId = row.querySelector('.view-platforms-btn')?.getAttribute('data-id') || row.querySelector('.delete-person-btn')?.getAttribute('data-id');
+
+            if (target.closest('.view-platforms-btn')) {
+                const person = people.find(p => p.id === personId);
+                renderPlatforms(person.platforms, person.name);
+                document.getElementById('people-list-view').classList.add('hidden');
+                document.getElementById('platforms-management-view').classList.remove('hidden');
+                peopleTableBody.setAttribute('data-current-person-id', personId);
+            } else if (target.closest('.delete-person-btn')) {
+                if (confirm('Tem certeza? Isso irá deletar todas as plataformas e apostas desta pessoa.')) {
+                    try {
+                        const personDocRef = doc(db, `users/${auth.currentUser.uid}/people`, personId);
+                        const platformsSnapshot = await getDocs(collection(personDocRef, 'platforms'));
+                        const deletePlatformsPromises = platformsSnapshot.docs.map(platDoc => deleteDoc(platDoc.ref));
+                        await Promise.all(deletePlatformsPromises);
+                        await deleteDoc(personDocRef);
+                        alert('Pessoa deletada com sucesso!');
+                        loadPeople();
+                    } catch (e) {
+                        console.error("Erro ao deletar pessoa: ", e);
+                        alert('Erro ao deletar pessoa. Tente novamente.');
+                    }
+                }
+            }
+        });
+    }
+
+    const platformsTableBody = document.getElementById('platforms-table-body');
+    if (platformsTableBody) {
+        platformsTableBody.addEventListener('click', async (e) => {
+            const target = e.target;
+            const platformId = target.closest('button').getAttribute('data-id');
+            const personId = document.getElementById('people-table-body').getAttribute('data-current-person-id');
+
+            if (target.closest('.edit-platform-btn')) {
+                const newBalanceStr = prompt("Ajustar saldo para:");
+                const newBalance = parseFloat(newBalanceStr);
+                if (newBalanceStr !== null && !isNaN(newBalance)) {
+                    try {
+                        const docRef = doc(db, `users/${auth.currentUser.uid}/people/${personId}/platforms`, platformId);
+                        await updateDoc(docRef, { balance: newBalance });
+                        alert('Saldo atualizado!');
+                        loadPeople();
+                        const person = people.find(p => p.id === personId);
+                        renderPlatforms(person.platforms, person.name);
+                    } catch (e) {
+                        alert('Erro ao atualizar saldo: ' + e.message);
+                    }
+                }
+            } else if (target.closest('.delete-platform-btn')) {
+                if (confirm('Tem certeza? Isso deletará a plataforma.')) {
+                    try {
+                        await deleteDoc(doc(db, `users/${auth.currentUser.uid}/people/${personId}/platforms`, platformId));
+                        alert('Plataforma deletada!');
+                        loadPeople();
+                        const person = people.find(p => p.id === personId);
+                        renderPlatforms(person.platforms, person.name);
+                    } catch (e) {
+                        alert('Erro ao deletar plataforma: ' + e.message);
+                    }
+                }
+            }
+        });
+    }
+
+    document.getElementById('back-to-people-btn').addEventListener('click', () => {
+        document.getElementById('people-list-view').classList.remove('hidden');
+        document.getElementById('platforms-management-view').classList.add('hidden');
+    });
+
     initializeAndSetupApp();
 </script>
 
