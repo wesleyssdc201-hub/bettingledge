@@ -812,7 +812,7 @@
                 await addDoc(collection(db, `users/${auth.currentUser.uid}/people`), { name, platforms: [] });
                 alert('Pessoa adicionada com sucesso!');
                 addPersonForm.reset();
-                loadPeople();
+                await loadPeople(); // Garante que a lista seja atualizada
             } catch (e) {
                 console.error("Erro ao adicionar pessoa: ", e);
                 alert('Erro ao adicionar pessoa. Tente novamente.');
