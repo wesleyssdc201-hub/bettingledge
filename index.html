@@ -1007,15 +1007,21 @@
         });
     }
 
+   let isDataLoaded = false;
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             authContainer.style.display = 'none';
             mainContent.style.display = 'block';
             console.log("Usuário logado:", user.email);
-            updateAll();
+            if (!isDataLoaded) {
+                updateAll();
+                isDataLoaded = true;
+            }
         } else {
             authContainer.style.display = 'block';
             mainContent.style.display = 'none';
+            isDataLoaded = false; // Resetar o flag ao deslogar
             console.log("Nenhum usuário logado.");
         }
     });
