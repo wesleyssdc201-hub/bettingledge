@@ -717,19 +717,22 @@
         };
 
         // Autenticação e Carregamento
-      auth.onAuthStateChanged(user => {
-    if (user) {
-        authContainer.style.display = 'none';
-        mainContent.style.display = 'block';
-        console.log("Usuário logado:", user.email);
-        // Chamar updateAll() para carregar todos os dados de uma vez
-        updateAll(); 
-    } else {
-        authContainer.style.display = 'block';
-        mainContent.style.display = 'none';
-        console.log("Nenhum usuário logado.");
-    }
-});
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                authContainer.style.display = 'none';
+                mainContent.style.display = 'block';
+                userDisplay.textContent = `Olá, ${user.email}`;
+                if (!isDataLoaded) {
+                    updateAll();
+                    isDataLoaded = true;
+                }
+            } else {
+                authContainer.style.display = 'block';
+                mainContent.style.display = 'none';
+                userDisplay.textContent = '';
+                isDataLoaded = false;
+            }
+        });
 
         loginButton.addEventListener('click', () => {
             const email = emailInput.value;
